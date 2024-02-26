@@ -1,0 +1,69 @@
+{
+  "project_info": {
+    "project_number": "807802462117",
+    "firebase_url": "https://wizdrif-default-rtdb.firebaseio.com",
+    "project_id": "wizdrif",
+    "storage_bucket": "wizdrif.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:807802462117:android:dbf70e9160af89f7db124c",
+        "android_client_info": {
+          "package_name": "com.example.wizdriflauncher"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "807802462117-ma3ghtfmu031q5dm6pivrct8bi0t4k5c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD01aWbsC97CV9cM1oCBc8wcncvUtQOxfs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "807802462117-ma3ghtfmu031q5dm6pivrct8bi0t4k5c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:807802462117:android:9cf04a2aa96429ebdb124c",
+        "android_client_info": {
+          "package_name": "com.rnexpo.wizdrif"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "807802462117-ma3ghtfmu031q5dm6pivrct8bi0t4k5c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD01aWbsC97CV9cM1oCBc8wcncvUtQOxfs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "807802462117-ma3ghtfmu031q5dm6pivrct8bi0t4k5c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
