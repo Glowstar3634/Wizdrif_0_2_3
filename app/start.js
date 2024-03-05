@@ -4,19 +4,60 @@ import { SafeAreaView, StyleSheet, Text, View, Image, TouchableOpacity, TextInpu
 import React from 'react'
 import styles from '../styles/search';
 import { COLORS } from '../constants';
-import auth from '../firebase';
+import Profile from './objects/profileObj';
+import { auth, database } from '../firebase';
+import {get, ref, set} from 'firebase/database';
 import {signOut, onAuthStateChanged, signInWithEmailAndPassword, getAuth, createUserWithEmailAndPassword} from '@firebase/auth'
 
 const Start = () => {
   const navigation = useNavigation();
+  let currentUser = new Profile();
 
   const [usernameInput, onUsernameUpdate] = React.useState('');
   const [passwordInput, onPasswordUpdate] = React.useState('');
 
   const login = async() => {
-    await signInWithEmailAndPassword(getAuth(), usernameInput, passwordInput);
-    console.log('User signed in successfully!');
-    
+    if (usernameInput.includes('@')){
+      try {
+        await signInWithEmailAndPassword(getAuth(), usernameInput, passwordInput);
+        console.log("Log In Success!");
+        const usersSnapshot = await get(ref(database, 'users'));
+        usersSnapshot.forEach((userSnapshot) => {
+          try {
+            const userData = userSnapshot.val();
+            if (userData.email === usernameInput) {
+              let currentUser = new Profile(userData);
+              console.log("Set currentUser with email to:", currentUser.getUsername());
+              navigation.navigate("classroom", {currentUser: currentUser});
+            }
+          } catch (error) {
+            console.error("Error in loop:", error.message); // Log any errors that occur inside the loop
+          }
+        });
+      } catch (error) {
+        console.log("Some other error occurred:", error.message);
+      }
+
+    }else{
+      const email = await get(ref(database, 'users/' + usernameInput + '/email'));
+      if (email.exists()){
+        try {
+          await signInWithEmailAndPassword(getAuth(), email, passwordInput);
+          console.log("Log In Success!");
+          const snapshot = await get(ref(database, 'users/' + usernameInput));
+          const profileData = snapshot.val();
+          if (profileData && typeof profileData === 'object') {
+            let currentUser = new Profile(profileData);
+            console.log("Set currentUser with username to:", currentUser.getUsername());
+            navigation.navigate("classroom", {currentUser: currentUser});
+          }
+        } catch (error) {
+          console.log("Incorrect password, or some other error occured:", error.message);
+        }
+      }else {
+        console.log("User does not exist.");
+      }
+    }
   }
   
   return (

@@ -76,7 +76,15 @@ function passwordCheck(txt) {
         newAccount.setUsername(usernameInput);
         newAccount.setEmail(emailInput);
         newAccount.setPassword(passwordInput);
-        const currentUser = newAccount;
+        const currentUser = new Profile();
+        currentUser.setUsername(newAccount.getUsername());
+        currentUser.setEmail(newAccount.getEmail());
+        currentUser.setPassword(newAccount.getPassword());
+        currentUser.setFirstName(newAccount.getFirstName());
+        currentUser.setLastName(newAccount.getLastName());
+        currentUser.setAccount(newAccount.getAccount());
+        currentUser.setAge(newAccount.getAge());
+        currentUser.setGrade(newAccount.getGrade());
 
         await createUserWithEmailAndPassword(getAuth(), emailInput, passwordInput);
         console.log('User created successfully!');
@@ -84,6 +92,7 @@ function passwordCheck(txt) {
         set(reference, currentUser)
         .then(() => {
           console.log('Profile data successfully saved to Firebase');
+          navigation.navigate("classroom", {currentUser: currentUser});
         })
         .catch((error) => {
           console.error('Error saving profile data:', error);

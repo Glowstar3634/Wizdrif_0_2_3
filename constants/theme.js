@@ -4,9 +4,11 @@ const COLORS = {
   tertiary: "#FF7754",
 
   gray: "#83829A",
+  gray1: "#636064",
   gray2: "#C1C0C8",
 
   dark: "#1c1d21",
+  dark1: "#141417",
 
   light:"#CDCDCD",
 
@@ -25,7 +27,7 @@ const COLORS = {
   wizPurpLight: "#C2B1F2FF",
 
   green: "#1DC700",
-  gray1: "#BB444448"
+  
 };
 
 const FONT = {

@@ -4,43 +4,66 @@ import { SafeAreaView, StyleSheet, Text, View, Image, TouchableOpacity, TextInpu
 import React from 'react'
 import styles from '../styles/search';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as Progress from 'react-native-progress';
 import {Picker} from '@react-native-picker/picker';
 import { COLORS } from '../constants';
 
-const Classroom = () => {
-  const logoRatio = null;
-  Image.getSize('../constants/images/brand/wizdriflogo_png.png', (width, height) => { logoRatio = width /width;})
+const Classroom = ({route}) => {
+  const { currentUser } = route.params;
+  let currentXP = currentUser.getXp();
+  let req = -1 * (Math.pow(1.04, ((-1 * currentUser.getLevel()) + 215.473))) + 5000;
+  let xpProgress = currentXP/req;
+
   return (
     <SafeAreaView style={{
-        flex:1,
-        display:'flex',
-        alignItems:'center',
-        justifyContent:'center',
-        backgroundColor:COLORS.dark
+      flex: 1,
+      backgroundColor: COLORS.dark
     }}>
+      <View style={{
+        flex: 10,
+        margin:5,
+        flexDirection: "row",
+        justifyContent:'flex-start'
+      }}>
+        <Image
+            style={{  width: 50, height: '100%', alignSelf:"flex-start"}}
+            tintColor={COLORS.white}
+            source={require('../constants/images/UIcons/icons8-person-64.png')}
+        />
+
         <View style={{
-        alignContent:'flex-start',
-        flexDirection: 'row',
-        justifyContent:'flex-start',
-        flex:1,
-        width: '90%', height: '30%'
-        }}>
-          <Image
-            style={{ width: 50, aspectRatio: logoRatio, alignSelf:"center"}}
-            source={require('../constants/images/brand/wizdriflogo_png.png')}
-          />
-        </View>
+        margin:10,
+        flexDirection: "column",
+        justifyContent:'space-around'
+      }}>
+        <Text
+            style={styles.pageTopText}
+        >{currentUser.getUsername()}</Text>
+
+        <Text
+            style={styles.pageTopText}
+        >Level: {currentUser.getLevel()}</Text>
+
+        <Progress.Bar style={{color:'#FFFFFF'}} progress={xpProgress} color='#FFFFFF' width={200} />
+
+      </View>
+{/* Navigation drawer add*/}
+      </View>
+
+      <View style={{ 
+        flex: 1,
+        flexDirection: "row",
+        backgroundColor:COLORS.dark1
+      }}>
         
-        <ScrollView style={{
-        alignContent:'space-around',
-        flexDirection: 'column',
-        flex:7,
-        width:'100%',
-        backgroundColor:COLORS.white,
+      </View>
+
+      <View style={{
+        flex: 90,
         borderTopRightRadius: 70,
-        }}>
-        
-        </ScrollView>
+      }}>
+        {/* Content for the ScrollView section */}
+      </View>
     </SafeAreaView>
   )
 }

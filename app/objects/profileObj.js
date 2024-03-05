@@ -1,6 +1,6 @@
 class Profile {
 
-    constructor(u, fn, ln, pw, e, a, g,acc,b,l,x,s,pf,f,p) {
+    constructor(u, fn, ln, pw, e, a, g,acc,b,l,x,s,pf,f,p,r) {
         if(arguments.length == 0){
             this.username = null;
             this.firstName = null;
@@ -10,13 +10,32 @@ class Profile {
             this.age = null;
             this.grade = null;
             this.account = 0;
-            this.bio = null;
-            this.level = null;
-            this.xp = null;
+            this.bio = "This person hasn't created a bio yet!";
+            this.level = 0;
+            this.xp = 0;
             this.strikes = 0;
             this.pfp = null;
             this.friends = [];
             this.posts = [];
+            this.relics = [];
+        }
+        else if(arguments.length == 1){
+            this.username = u.username;
+            this.firstName = u.firstName;
+            this.lastName = u.lastName;
+            this.password = u.password;
+            this.email = u.email;
+            this.age = u.age;
+            this.grade = u.grade;
+            this.account = u.account;
+            this.bio = u.bio;
+            this.level = u.level;
+            this.xp = u.xp;
+            this.strikes = u.strikes;
+            this.pfp = u.pfp;
+            this.friends = u.friends;
+            this.posts = u.posts;
+            this.relics = u.relics;
         }
         else if(arguments.length == 7){
             this.username = u;
@@ -27,13 +46,14 @@ class Profile {
             this.age = a;
             this.grade = g;
             this.account = acc;
-            this.bio = "";
+            this.bio = "This person hasn't created a bio yet!";
             this.level = 0;
             this.xp = 0;
             this.strikes = 0;
             this.pfp = null;
             this.friends = [];
             this.posts = [];
+            this.relics = [];
         }
         else{
             this.username = u;
@@ -51,6 +71,7 @@ class Profile {
         this.pfp = pf;
         this.friends = f;
         this.posts = p;
+        this.relics = r;
         }
     }
 
@@ -164,6 +185,18 @@ class Profile {
 
     getPfp() {
         return this.pfp;
+    }
+
+    getRelics(){
+        return this.relics;
+    }
+
+    getPosts(){
+        return this.posts;
+    }
+
+    getFriends(){
+        return this.friends;
     }
 
 }

@@ -112,6 +112,13 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         alignItems:'center'
     },
+    pageTopText:{
+        fontSize: 20,
+        color: 'white',
+        width:'100%',
+        textAlign: 'left',
+        fontWeight: 'bold'
+    },
     startDescs:{
         fontSize: 15,
         marginTop: 10,
@@ -145,6 +152,15 @@ const styles = StyleSheet.create({
         alignSelf:"center",
         justifyContent: 'center',
         width:'70%',
+        borderRadius: 20,
+        backgroundColor: COLORS.light
+    },
+    postContainer:{
+        height:500,
+        alignItems: 'center',
+        alignSelf:"center",
+        justifyContent: 'center',
+        width:'85%',
         borderRadius: 20,
         backgroundColor: COLORS.light
     }

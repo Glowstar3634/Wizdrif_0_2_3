@@ -4,9 +4,9 @@ import { SafeAreaView, StyleSheet, Text, View, Image, TouchableOpacity, TextInpu
 import React from 'react'
 import styles from '../styles/search';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import {Picker} from '@react-native-picker/picker';
+import { Picker } from '@react-native-picker/picker';
 import { COLORS } from '../constants';
-import {Profile} from "./objects/profileObj";
+import { Profile} from "./objects/profileObj";
 
 const SignUpStudent = ({route}) => {
   const { newAccount } = route.params;
