@@ -5,10 +5,11 @@ const COLORS = {
 
   gray: "#83829A",
   gray1: "#636064",
-  gray2: "#C1C0C8",
+  gray2: "#4D4C4C",
 
   dark: "#1c1d21",
   dark1: "#141417",
+  dark2: "#2e2e2e",
 
   light:"#CDCDCD",
 

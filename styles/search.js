@@ -163,7 +163,117 @@ const styles = StyleSheet.create({
         width:'85%',
         borderRadius: 20,
         backgroundColor: COLORS.light
-    }
+    },
+    sectionHeader:{
+        color: 'white', 
+        fontSize: 25, 
+        fontWeight: 'bold',
+        alignContent: 'flex-start',
+        marginTop:10,
+        marginStart:10,
+        alignSelf: 'flex-start'
+    },
+    sectionSubHeader:{
+        color: 'white', 
+        fontSize: 12,
+        fontStyle: 'italic',
+        alignContent: 'flex-start',
+        marginTop:5,
+        marginStart:50,
+        alignSelf: 'flex-start'
+    },
+    subSectionHeader:{
+        color: 'white', 
+        fontSize: 20,
+        fontWeight: '500',
+        alignContent: 'flex-start',
+        marginTop:10,
+        marginStart:20,
+        alignSelf: 'flex-start'
+    },
+    sectionShadow:{
+        shadowColor: COLORS.dark1,
+        shadowOffset: {
+          width: 0,
+          height: 3
+        },
+        shadowRadius: 3,
+        shadowOpacity: 1.0,
+        elevation: 5
+    },
+    fieldDesc:{
+        color: 'white', 
+        fontSize: 12,
+        fontWeight: '400',
+        alignContent: 'flex-start',
+        margin:15,
+        alignSelf: 'flex-start'
+    },
+    postHeader:{
+        color: 'white',
+        fontSize: 13,
+        fontWeight: '600',
+        alignContent: 'flex-end',
+        textAlign:'right',
+        marginRight:10,
+        alignSelf: 'flex-end'
+    },
+    postHeaderRight:{
+        color: 'white',
+        fontSize: 13,
+        fontWeight: '600',
+        alignContent: 'flex-start',
+        marginLeft:10,
+        alignSelf: 'flex-start'
+    },
+    postTitle:{
+        color: 'white',
+        fontSize: 18,
+        fontWeight: 'bold',
+        alignContent: 'flex-start',
+        marginLeft:10,
+        alignSelf: 'flex-start'
+    },
+    postDesc:{
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '500',
+        alignContent: 'flex-start',
+        marginLeft:10,
+        alignSelf: 'flex-start'
+    },
+    radioButton: { 
+        flexDirection: 'row', 
+        alignItems: 'center', 
+    }, 
+    field:{
+        borderRadius: 15,
+        height: 45,
+        width: '95%',
+        backgroundColor: COLORS.gray2,
+        alignSelf: 'center'
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: COLORS.dark2,
+        borderRadius: 20,
+        padding: 35,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+      },
+      centeredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 22,
+      }
 });
 
 export default styles;

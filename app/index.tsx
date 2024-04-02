@@ -15,6 +15,13 @@ import SignUpStudent from './signUpStudent';
 import SignUpStudent2 from './signUpStudent2';
 import Start from "./start";
 import Classroom from "./classroom";
+import Notebook from "./notebook";
+import PostView from "./postView";
+import Studyhall from "./studyhall";
+import WizWar from "./wizwarMenu";
+import CardView from "./cardView";
+import Homework from "./homework";
+import CreatePost from "./createPost";
 
 const Stack = createStackNavigator();
 const app = initializeApp(firebaseConfig);
@@ -30,6 +37,14 @@ const index = () => {
         <Stack.Screen name="signUpStudent" component={SignUpStudent} />
         <Stack.Screen name="signUpStudent2" component={SignUpStudent2} />
         <Stack.Screen name="classroom" component={Classroom} />
+        <Stack.Screen name="notebook" component={Notebook} />
+        <Stack.Screen name="studyhall" component={Studyhall} />
+        <Stack.Screen name="wizwar" component={WizWar} />
+        <Stack.Screen name="postview" component={PostView} />
+        <Stack.Screen name="cardview" component={CardView} />
+        <Stack.Screen name="createpost" component={CreatePost} />
+        <Stack.Screen name="homework" component={Homework} />
+        
       </Stack.Navigator>
   );
 };

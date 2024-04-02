@@ -4,12 +4,12 @@
     "slug": "Wizdrif_0_2_3",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./constants/images/brand/wizdriflogo_png.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./constants/images/brand/wizdriflogo_png.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#1c1d21"
     },
     "assetBundlePatterns": [
       "**/*"
