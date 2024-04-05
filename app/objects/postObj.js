@@ -6,7 +6,7 @@ class Post {
         this.title = t;
         this.postType = pt;
         this.topic = tp;
-        this.views = 0;
+        this.likes = 0;
         this.pics = 0;
         this.postID = ''; // Initialize with an empty string or null
     }
@@ -35,8 +35,8 @@ class Post {
         return this.description;
     }
 
-    getViews() {
-        return this.views;
+    getLikes() {
+        return this.likes;
     }
 
     getPostID() {
@@ -51,8 +51,12 @@ class Post {
         this.postID = postID;
     }
 
-    setViews(views) {
-        this.views = views;
+    like() {
+        this.likes++;
+    }
+
+    unlike() {
+        this.likes--;
     }
 
     setPics(pics) {

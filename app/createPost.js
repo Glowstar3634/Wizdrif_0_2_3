@@ -1,6 +1,8 @@
 import { useRouter } from "expo-router";
 import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView, StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ScrollView, Dimensions, Modal} from 'react-native'
+import { SafeAreaView, StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ScrollView, Dimensions, Modal, Switch} from 'react-native';
+import { SelectList } from 'react-native-dropdown-select-list';
+import * as ImagePicker from 'expo-image-picker';
 import React from 'react'
 import styles from '../styles/search';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -10,6 +12,18 @@ import { COLORS } from '../constants';
 
 import postTypes from "./lists/postTypes";
 import subjects from "./lists/subjects";
+import topicMathSpinner from "./lists/mathTopics";
+import topicScienceSpinner from "./lists/scienceTopics";
+import topicSocialStudiesSpinner from "./lists/ssTopics";
+import topicEnglishSpinner from "./lists/englishTopics";
+import topicBaESpinner from "./lists/baeTopics";
+import topicEngineeringSpinner from "./lists/engineeringTopics";
+import topicProgrammingSpinner from "./lists/programmingTopics";
+import topicOtherSpinner from "./lists/otherTopics";
+import noTopics from "./lists/noTopics";
+
+import badWordChecker from "./functions/badWordChecker";
+import scanContent from "./functions/scanContent";
 
 const CreatePost = ({route}) => {
   const { currentUser } = route.params;
@@ -21,9 +35,146 @@ const CreatePost = ({route}) => {
 
   const [titleInput, onTitleUpdate] = React.useState('');
   const [descInput, onDescUpdate] = React.useState('');
-  var images = [];
+  
+  const nullImage = require('../constants/images/UIcons/photos-10614.png');
+  const [images, onImagesUpdate] = React.useState([nullImage]);
   const [modalVisible, setModalVisible] = React.useState(false);
 
+  const [postType, setPostType] = React.useState("");
+  const [subject, setSubject] = React.useState("");
+  const [topicData, setTopicData] = React.useState(noTopics);
+  const [topic, setTopic] = React.useState("");
+  const [postPrivate, setPostPrivate] = React.useState(false);
+  const toggleSwitch = () => setPostPrivate(previousState => !previousState);
+
+  const create = async () => {
+    // Check if the post title is empty
+    if (!titleInput.trim()) {
+      alert('Please enter a title for your post');
+      return;
+    }
+    if (!descInput.trim()) {
+      alert('Please enter a description for your post');
+      return;
+    }
+    if (!badWordChecker(titleInput) || !badWordChecker(descInput)) {
+      alert('Your post contains inappropriate language');
+      return;
+    }
+    
+    if (!postType) {
+      alert('Please select a post type');
+      return;
+    }
+    if (!subject) {
+      alert('Please select a subject');
+      return;
+    }
+    if (!topic) {
+      alert('Please select a topic');
+      return;
+    }
+  
+    // Perform content scanning
+    if (images[0] != nullImage){
+      for(let i = 0; i < images.length; i++) {
+        const isContentSafe = await scanContent(images[i]);
+    if (!isContentSafe) {
+      alert('Your post contains inappropriate photos or content. Do not upload this content to Wizdrif.');
+      return;
+    }
+      }
+    }
+    // Proceed with creating the post
+    console.log('Post Type:', postType);
+    console.log('Title:', titleInput);
+    console.log('Subject:', subject);
+    console.log('Topic:', topic);
+    console.log('Post Body:', descInput);
+    console.log('Private:', postPrivate);
+    console.log('Images:', images);
+  
+    // Reset input fields
+    onTitleUpdate('');
+    onDescUpdate('');
+    setPostType('');
+    setSubject('');
+    setTopic('');
+    setPostPrivate(false);
+    imagesUpdate(nullImage);
+  
+    // confirmPostCreation
+  };
+
+  const topicSelector = (subject) => {
+    setSubject(subject);
+    if (subject == 'Math'){
+      setTopicData(topicMathSpinner);
+    } else if (subject == 'Science'){
+      setTopicData(topicScienceSpinner);
+    } else if (subject == 'Social Studies'){
+      setTopicData(topicSocialStudiesSpinner);
+    } else if (subject == 'English'){
+      setTopicData(topicEnglishSpinner);
+    } else if (subject == 'Business and Economics'){
+      setTopicData(topicBaESpinner);
+    } else if (subject == 'Engineering'){
+      setTopicData(topicEngineeringSpinner);
+    } else if (subject == 'Programming'){
+      setTopicData(topicProgrammingSpinner);
+    } else if (subject == 'Other'){
+      setTopicData(topicOtherSpinner);
+    } else {
+      setTopicData(noTopics);
+    }
+  }
+
+  const takePhoto = async() => {
+    let result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+    
+    if (!result.canceled) {
+      imagesUpdate(result.assets[0].uri);
+    }
+  }
+
+  const choosePhotos = async() => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    console.log(result);
+    
+    if (!result.canceled) {
+      imagesUpdate(result.assets[0].uri);
+    }
+  }
+
+  const imagesUpdate = (imageUri) => {
+    if (images[0] == nullImage && imageUri != null){
+      images.pop();
+      images.push(imageUri);
+      console.log("switcharoo");
+    } else if (images.length != 6 && imageUri != null){
+      images.push(imageUri);
+    } else if (imageUri == null){
+      images.pop();
+      if (images.length == 0){
+        images.push(nullImage)
+      }
+      console.log("gone");
+    }
+    onImagesUpdate([...images]);
+  }
+  
   return (
     <SafeAreaView style={{
       flex: 1,
@@ -70,7 +221,7 @@ const CreatePost = ({route}) => {
             <TouchableOpacity style={{
               alignContent:'center',
               width:'90%'
-            }} onPress={() => setModalVisible(true)}>
+            }} onPress={takePhoto}>
               <View style={[ styles.sectionShadow , {
                 borderRadius: 20,
                 height: 60,
@@ -97,7 +248,7 @@ const CreatePost = ({route}) => {
             <TouchableOpacity style={{
               alignContent:'center',
               width:'90%'
-            }} onPress={() => setModalVisible(true)}>
+            }} onPress={choosePhotos}>
               <View style={[ styles.sectionShadow , {
                 borderRadius: 20,
                 height: 60,
@@ -148,9 +299,20 @@ const CreatePost = ({route}) => {
           height: 60,
           marginTop: 20,
           width: '95%',
-          backgroundColor: COLORS.dark2
+          backgroundColor: COLORS.dark2,
+          flexDirection: 'row',
+          alignItems:'center',
+          justifyContent:'center'
         }, styles.sectionShadow]}>
-        {/* Content filter control */}
+          <Text style={[styles.fieldDesc,{fontSize:15,fontWeight:'600', alignSelf:'center'}]}>Public</Text>
+          <Switch
+        trackColor={{false: COLORS.dark1, true: COLORS.gray2}}
+        thumbColor={postPrivate ? COLORS.white : COLORS.gray2}
+        ios_backgroundColor={COLORS.dark1}
+        onValueChange={toggleSwitch}
+        value={postPrivate}
+      />
+          <Text style={[styles.fieldDesc,{fontSize:15,fontWeight:'600', alignSelf:'center'}]}>Private</Text>
         </View>
 
         <View style={[ styles.sectionShadow , {
@@ -160,27 +322,63 @@ const CreatePost = ({route}) => {
           width: '95%',
           backgroundColor: COLORS.dark2
         }]}>
-          <Text style={styles.fieldDesc}>Post Filter</Text>
-          <View style={styles.field}>
-          {/* type dropdown */}
+          <Text style={styles.fieldDesc}>What type of post is this?</Text>
+          <View style={[styles.field]}>
+          <SelectList 
+        setSelected={(postType) => setPostType(postType)} 
+        data={postTypes} 
+        save="value"
+        inputStyles={{
+          color:COLORS.white
+        }}
+        dropdownStyles={{
+          backgroundColor:COLORS.white,
+          elevation:10,
+          zIndex:5
+        }}
+    />
           </View>
 
           <View style={{
             width: '100%',
             flexDirection: 'row',
-            justifyContent:'space-around'
+            justifyContent:'space-around', zIndex:-5
           }}>
-            <View style={[styles.safeContain, {flex:1}]}>
+            <View style={[styles.safeContain, {flex:1, zIndex:-5}]}>
               <Text style={styles.fieldDesc}>Subject</Text>
               <View style={[styles.field, {width:'90%'}]}>
-              {/* Subject dropdown */}
+              <SelectList 
+        setSelected={(subject) => topicSelector(subject)} 
+        data={subjects} 
+        save="value"
+        inputStyles={{
+          color:COLORS.white
+        }}
+        dropdownStyles={{
+          backgroundColor:COLORS.white,
+          elevation:10,
+          zIndex:5
+        }}
+    />
               </View>
             </View>
 
-            <View style={[styles.safeContain, {flex:1}]}>
+            <View style={[styles.safeContain, {flex:1, zIndex:-5}]}>
               <Text style={styles.fieldDesc}>Topic</Text>
               <View style={[styles.field, {width:'90%'}]}>
-              {/* Topic dropdown */}
+              <SelectList 
+        setSelected={(topic) => setTopic(topic)} 
+        data={topicData}
+        save="value"
+        inputStyles={{
+          color:COLORS.white
+        }}
+        dropdownStyles={{
+          backgroundColor:COLORS.white,
+          elevation:10,
+          zIndex:5
+        }}
+    />
               </View>
             </View>
           </View>
@@ -188,26 +386,27 @@ const CreatePost = ({route}) => {
 
         <View style={[ styles.sectionShadow , {
           borderRadius: 20,
-          height: 200,
+          height: 250,
           marginTop: 20,
           width: '95%',
-          backgroundColor: COLORS.dark2
+          backgroundColor: COLORS.dark2, zIndex:-5
         }]}>
           <Text style={styles.fieldDesc}>Post Title</Text>
           <View style={styles.field}>
           <TextInput 
-            style={styles.startInput}
+            style={[styles.startInput,{color:COLORS.white}]}
             onChangeText={titleInput => onTitleUpdate(titleInput)}
             defaultValue= {titleInput}
           />
           </View>
 
           <Text style={styles.fieldDesc}>Add Description</Text>
-          <View style={styles.field}>
+          <View style={[styles.field, {height:90}]}>
           <TextInput 
-            style={styles.startInput}
+            style={[styles.startInput,{width: (width*0.95*0.95), height:'auto', color:COLORS.white}]}
             onChangeText={descInput => onDescUpdate(descInput)}
             defaultValue= {descInput}
+            multiline={true}
           />
           </View>
         </View>
@@ -220,7 +419,7 @@ const CreatePost = ({route}) => {
         backgroundColor:COLORS.dark1
         }}/>
 
-        <Text style={styles.subSectionHeader}>Add Photos</Text>
+        <Text style={styles.subSectionHeader}>Add Photos ({(images.length)}/6)</Text>
         <View style={{
             width: '100%',
             alignSelf:'center',
@@ -250,12 +449,12 @@ const CreatePost = ({route}) => {
                   height:28,
                   alignSelf:'center',
                   marginStart:20,
-                }}>Posts</Text>
+                }}>Attach Image</Text>
 
               </View>
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.safeContain, {flex:1}]} onPress={() => navigation.navigate("cardview", {currentUser: currentUser})}>
+            <TouchableOpacity style={[styles.safeContain, {flex:1}]} onPress={() => imagesUpdate(null)}>
               <View style={[ styles.sectionShadow , {
                 borderRadius: 20,
                 height: 60,
@@ -276,7 +475,7 @@ const CreatePost = ({route}) => {
                   height:28,
                   alignSelf:'center',
                   marginStart:20,
-                }}>Cards</Text>
+                }}>Remove Last</Text>
               </View>
             </TouchableOpacity>
         </View>
@@ -298,40 +497,32 @@ const CreatePost = ({route}) => {
     pagingEnabled={true}
     horizontal={true}
     scrollEventThrottle={16} >
-        <View style={{
+        {(images[0] == nullImage) && (<View style={{
           width: (width*81/100),
           marginLeft:(width*225/10000),
           marginRight:(width*225/10000)
         }}>
             <Image
             style={{ width: '100%', height: '100%', resizeMode:'contain'}}
+            resizeMode="contain"
             tintColor={COLORS.white}
             borderRadius={30}
-            source={require('../constants/images/UIcons/photos-10614.png')}/>
-        </View>
-        <View style={{
-          width: (width*81/100),
-          marginLeft:(width*225/10000),
-          marginRight:(width*225/10000)
-        }}>
-            <Image
-            style={{ width: '100%', height: '100%', resizeMode:'contain'}}
-            tintColor={COLORS.white}
-            borderRadius={30}
-            source={require('../constants/images/UIcons/photos-10614.png')}/>
-        </View>
-        <View style={{
-          width: (width*81/100),
-          marginLeft:(width*225/10000),
-          marginRight:(width*225/10000)
-        }}>
-            <Image
-            style={{ width: '100%', height: '100%', resizeMode:'contain'}}
-            tintColor={COLORS.white}
-            borderRadius={30}
-            source={require('../constants/images/UIcons/photos-10614.png')}/>
-        </View>
+            source={nullImage}/>
+        </View>)}
         
+        {images.map((image, index) => ((images[0] != nullImage) && (
+        <View style={{
+          width: (width*81/100),
+          marginLeft:(width*225/10000),
+          marginRight:(width*225/10000)
+        }} key={index}>
+            <Image
+            style={{ width: '100%', height: '100%', resizeMode:'contain'}}
+            resizeMode="contain"
+            borderRadius={30}
+            source={{ uri: image }}/>
+        </View>
+        )))}
 </ScrollView>
           </View>
 
@@ -345,7 +536,7 @@ const CreatePost = ({route}) => {
 
 <TouchableOpacity style={{
   width: 'auto'
-}}>
+}} onPress={create}>
               <View style={[ styles.sectionShadow , {
                 borderRadius: 20,
                 height: 60,
