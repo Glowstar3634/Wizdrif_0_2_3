@@ -167,10 +167,10 @@ const CardView = ({route}) => {
                 </View>
                 <View style={styles.radioButton}> 
                     <RadioButton.Android 
-                        value="option2"
-                        status={selectedAnswer === 'option2' ?  
+                        value="option3"
+                        status={selectedAnswer === 'option3' ?  
                                  'checked' : 'unchecked'} 
-                        onPress={() => setSelectedAnswer('option2')} 
+                        onPress={() => setSelectedAnswer('option3')} 
                         color={COLORS.wizBlue}
                     /> 
                     <Text style={styles.fieldDesc}> 
@@ -179,10 +179,10 @@ const CardView = ({route}) => {
                 </View>
                 <View style={styles.radioButton}> 
                     <RadioButton.Android 
-                        value="option2"
-                        status={selectedAnswer === 'option2' ?  
+                        value="option4"
+                        status={selectedAnswer === 'option4' ?  
                                  'checked' : 'unchecked'} 
-                        onPress={() => setSelectedAnswer('option2')} 
+                        onPress={() => setSelectedAnswer('option4')} 
                         color={COLORS.wizBlue}
                     /> 
                     <Text style={styles.fieldDesc}> 

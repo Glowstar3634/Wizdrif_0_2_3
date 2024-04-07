@@ -12,6 +12,8 @@ class Card {
         this.correct = correct;
         this.hasPic = hasPic;
         this.views = views;
+        this.private = false;
+        this.tags = [];
     }
 
     getCardID() {
@@ -19,6 +21,20 @@ class Card {
     }
     setCardID(cardID) {
         this.cardID = cardID;
+    }
+
+    getTags() {
+        return this.tags;
+    }
+    setTags(tag) {
+        this.tags = tag;
+    }
+
+    getPrivate(){
+        return this.private
+    }
+    setPrivate(pri){
+        this.private = pri;
     }
 
     getPoster() {
@@ -98,3 +114,4 @@ class Card {
         this.views = views;
     }
 }
+export default Card;

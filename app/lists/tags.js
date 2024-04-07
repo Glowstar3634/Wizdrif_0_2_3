@@ -1,8 +1,9 @@
 const tags = [
     "AP",
-    "SAT",
+    "SAT/ACT",
     "Competition",
     "Extracurricular",
-    "Study"
+    "Study",
+    "Activity"
 ];
 export default tags;

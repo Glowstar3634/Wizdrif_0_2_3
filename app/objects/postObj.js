@@ -8,7 +8,9 @@ class Post {
         this.topic = tp;
         this.likes = 0;
         this.pics = 0;
-        this.postID = ''; // Initialize with an empty string or null
+        this.postID = '';
+        this.private = false;
+        this.tags = [];
     }
 
     getPoster() {
@@ -31,6 +33,10 @@ class Post {
         return this.topic;
     }
 
+    getTags() {
+        return this.tags;
+    }
+
     getDescription() {
         return this.description;
     }
@@ -45,6 +51,10 @@ class Post {
 
     getPics() {
         return this.pics;
+    }
+
+    getPrivate() {
+        return this.private;
     }
 
     setPostID(postID) {
@@ -62,4 +72,14 @@ class Post {
     setPics(pics) {
         this.pics = pics;
     }
+
+    setTags(tag) {
+        this.tags = tag;
+    }
+
+    setPrivate(priv) {
+        this.private = priv;
+    }
 }
+
+export default Post;

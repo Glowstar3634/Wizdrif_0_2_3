@@ -6,6 +6,7 @@ const uriBase = `${endpoint}/vision/v3.0/analyze`;
 
 const scanContent = async (image) => {
     try {
+      console.log('Initiating...');
         const params = {
             visualFeatures: 'Adult', // Adjust as needed
             details: '',
@@ -20,15 +21,36 @@ const scanContent = async (image) => {
             params,
         });
 
+        console.log('Retriving results...');
+
         const data = response.data;
         const adultContent = data.adult;
         const isAdultOrRacy = adultContent.isAdultContent || adultContent.isRacyContent;
 
         return !isAdultOrRacy;
-    } catch (error) {
-        console.error('Error scanning content:', error);
-        return null;
+    } catch (error) {  //fix issue with image being TOO LARGE
+      console.error('Error scanning content:', error);
+      if (error.response) {
+          console.error('Response data:', error.response.data);
+      }
+      if (error.request) {
+          console.error('Request data:', error.request);
+      }
+      return null;
     }
+};
+
+const blobToOctetStream = async (blob) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const arrayBuffer = reader.result;
+      const octetStream = new Uint8Array(arrayBuffer);
+      resolve(octetStream);
+    };
+    reader.onerror = reject;
+    reader.readAsArrayBuffer(blob);
+  });
 };
 
 export default scanContent;

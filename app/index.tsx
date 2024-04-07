@@ -22,6 +22,7 @@ import WizWar from "./wizwarMenu";
 import CardView from "./cardView";
 import Homework from "./homework";
 import CreatePost from "./createPost";
+import CreateCard from "./createCard";
 
 const Stack = createStackNavigator();
 const app = initializeApp(firebaseConfig);
@@ -43,6 +44,7 @@ const index = () => {
         <Stack.Screen name="postview" component={PostView} />
         <Stack.Screen name="cardview" component={CardView} />
         <Stack.Screen name="createpost" component={CreatePost} />
+        <Stack.Screen name="createcard" component={CreateCard} />
         <Stack.Screen name="homework" component={Homework} />
         
       </Stack.Navigator>

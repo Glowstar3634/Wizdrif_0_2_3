@@ -3,6 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView, StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ScrollView, Dimensions, Modal, Switch} from 'react-native';
 import { SelectList, MultipleSelectList  } from 'react-native-dropdown-select-list';
 import * as ImagePicker from 'expo-image-picker';
+import { RadioButton } from 'react-native-paper';
 import React from 'react'
 import styles from '../styles/search';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -29,12 +30,13 @@ import * as FileSystem from 'expo-file-system';
 import { Buffer } from 'buffer';
 
 import Post from "./objects/postObj";
+import Card from "./objects/cardObj";
 import {Profile} from './objects/profileObj';
 import { auth, database, storage, firebase } from '../firebase';
 import {ref, set} from 'firebase/database';
 
 
-const CreatePost = ({route}) => {
+const CreateCard = ({route}) => {
   const { currentUser } = route.params;
   const navigation = useNavigation();
   let currentXP = currentUser.getXp();
@@ -43,13 +45,16 @@ const CreatePost = ({route}) => {
   const { width, height } = Dimensions.get('window');
 
   const [titleInput, onTitleUpdate] = React.useState('');
-  const [descInput, onDescUpdate] = React.useState('');
+  const [option1, onOption1Update] = React.useState('Edit Option 1');
+  const [option2, onOption2Update] = React.useState('Edit Option 2');
+  const [option3, onOption3Update] = React.useState('Edit Option 3');
+  const [option4, onOption4Update] = React.useState('Edit Option 4');
   
   const nullImage = require('../constants/images/UIcons/photos-10614.png');
-  const [images, onImagesUpdate] = React.useState([nullImage]);
+  const [image, onImagesUpdate] = React.useState([nullImage]);
   const [modalVisible, setModalVisible] = React.useState(false);
 
-  const [postType, setPostType] = React.useState("");
+  const [selectedAnswer, setSelectedAnswer] = React.useState(null); 
   const [subject, setSubject] = React.useState("");
   const [topicData, setTopicData] = React.useState(noTopics);
   const [topic, setTopic] = React.useState("");
@@ -65,27 +70,27 @@ const CreatePost = ({route}) => {
       alert('Please enter a title for your post');
       return;
     }
-    if (titleInput.length > 50) {
-      alert('Maximum title length of 50 characters');
+    if (titleInput.length > 400) {
+      alert('Maximum question length of 400 characters');
       return;
     }
-    if (!descInput.trim()) {
-      alert('Please enter a description for your post');
+    if (option1 == 'Edit Option 1' || option2 == 'Edit Option 2' || option3 == 'Edit Option 3' || option4 == 'Edit Option 4') {
+      alert('Please edit the answer choices');
       return;
     }
-    if (descInput.length > 400) {
-      alert('Maximum description length of 400 characters');
+    if (option1.length > 400 || option2.length > 400 || option3.length > 400 || option4.length > 400) {
+        alert('Maximum answer choice length of 400 characters');
+        return;
+    }
+    if (selectedAnswer == null) {
+      alert('Please select a correct answer choice');
       return;
     }
-    if (!badWordChecker(titleInput) || !badWordChecker(descInput)) {
+    if (!badWordChecker(titleInput) || !badWordChecker(option1) || !badWordChecker(option2) || !badWordChecker(option3) || !badWordChecker(option4)) {
       alert('Your post contains inappropriate language');
       return;
     }
     
-    if (!postType) {
-      alert('Please select a post type');
-      return;
-    }
     if (!subject) {
       alert('Please select a subject');
       return;
@@ -96,9 +101,8 @@ const CreatePost = ({route}) => {
     }
   
     // Perform content scanning
-    if (images[0] != nullImage){
-      for(let i = 0; i < images.length; i++) {
-        const uri = images[i].uri;
+    if (image[0] != nullImage){
+        const uri = image[0].uri;
         console.log('Localizing...');
         const fileInfo = await FileSystem.getInfoAsync(uri);
         const { uri: localUri } = fileInfo;
@@ -108,10 +112,9 @@ const CreatePost = ({route}) => {
         console.log('Calling...');
         const isContentSafe = await scanContent(octetStream);
     if (!isContentSafe) {
-      alert('Your post contains inappropriate photos or content. Attempting to upload this content will disable your account.');
+      alert('Your card contains inappropriate photos or content. Attempting to upload this content will disable your account.');
       return;
     } 
-      }
     }
     console.log('Proceeding...');
     
@@ -121,13 +124,16 @@ const CreatePost = ({route}) => {
     if(tags2 && tags1 != tags2){
       postTags.push(tags2);
     }
-    console.log('Post Type:', postType);
-    console.log('Title:', titleInput);
+    console.log('Question:', titleInput);
     console.log('Subject:', subject);
     console.log('Topic:', topic);
-    console.log('Post Body:', descInput);
+    console.log('Option 1:', option1);
+    console.log('Option 2:', option2);
+    console.log('Option 3:', option3);
+    console.log('Option 4:', option4);
+    console.log('Correct Option:', selectedAnswer);
     console.log('Private:', postPrivate);
-    console.log('Images:', (images[0] != nullImage));
+    console.log('Has Image:', (image[0] != nullImage));
     console.log('Tags:', postTags.length);
 
     uploadPost();
@@ -137,25 +143,21 @@ const CreatePost = ({route}) => {
 
   const uploadPost = async () =>{
     let d = new Date();
-    let postID = "post" + d.getTime() + "=" + currentUser.getUsername();
-    let newPost = new Post(currentUser.getUsername(), subject, descInput, titleInput, postType, topic);
-    newPost.setPostID(postID);
-    newPost.setPics(images.length);
-    if (images[0] == nullImage){
-      newPost.setPics(0);
+    let cardID = "card" + d.getTime() + "=" + currentUser.getUsername();
+    let newCard = new Card(cardID, currentUser.getUsername(), subject, topic, titleInput, option1, option2, option3, option4, selectedAnswer, true, 0);
+    if (image[0] == nullImage){
+        newCard.setHasPic(false);
     }
-    newPost.setPrivate(postPrivate);
-    newPost.setTags(postTags);
+    newCard.setPrivate(postPrivate);
+    newCard.setTags(postTags);
 
-
-    const userPostRef = ref(database, 'users/' +currentUser.getUsername()+ "/posts/" + postID);
-    const pubPostRef = ref(database, 'posts/' + postID);
-    set(userPostRef, newPost) //Publishing to user post reference
+    const userPostRef = ref(database, 'users/' +currentUser.getUsername()+ "/cards/" + cardID);
+    const pubPostRef = ref(database, 'cards/' + cardID);
+    set(userPostRef, newCard) //Publishing to user card reference
     .then(async() => {
       console.log('Post data successfully saved to user reference');
-      if (images[0] != nullImage){ //Uploading images
-        for(let i = 0; i < images.length; i++) {
-          const { uri } = await FileSystem.getInfoAsync(images[i].uri);
+      if (image[0] != nullImage){ //Uploading image
+          const { uri } = await FileSystem.getInfoAsync(image[0].uri);
           const blob = await new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
             xhr.onload = () => {
@@ -169,24 +171,24 @@ const CreatePost = ({route}) => {
             xhr.send(null);
           });
 
-          const ref = firebase.storage().ref('images/posts/' + postID).child('pic' + (i+1));
+          const ref = firebase.storage().ref('images/cards/' + cardID).child('pic1');
 
           await ref.put(blob);
-        }
+        
       }
-      if(!newPost.getPrivate()){ 
-        set(pubPostRef, newPost) //Publishing to public posts reference
+      if(!newCard.getPrivate()){ 
+        set(pubPostRef, newCard) //Publishing to public cards reference
         .then(async() => {
-          console.log('Post data published successfully to posts reference');
-          alert('Post data published successfully to Wizdrif server');
+          console.log('Flashcard data published successfully to cards reference');
+          alert('Flashcard data published successfully to Wizdrif server');
         })
         .catch((error) => {
-          console.error('Error making post data public:', error);
+          console.error('Error making card data public:', error);
         });
       }
     })
     .catch((error) => {
-      console.error('Error uploading post data:', error);
+      console.error('Error uploading card data:', error);
     });
   }
 
@@ -248,20 +250,20 @@ const CreatePost = ({route}) => {
   }
 
   const imagesUpdate = (imageUri) => {
-    if (images[0] == nullImage && imageUri != null){
-      images.pop();
-      images.push(imageUri);
+    if (image[0] == nullImage && imageUri != null){
+      image.pop();
+      image.push(imageUri);
       console.log("switcharoo");
-    } else if (images.length != 6 && imageUri != null){
-      images.push(imageUri);
+    } else if (image.length != 1 && imageUri != null){
+      image.push(imageUri);
     } else if (imageUri == null){
-      images.pop();
-      if (images.length == 0){
-        images.push(nullImage)
+      image.pop();
+      if (image.length == 0){
+        image.push(nullImage)
       }
       console.log("gone");
     }
-    onImagesUpdate([...images]);
+    onImagesUpdate([...image]);
   }
   
   return (
@@ -285,7 +287,7 @@ const CreatePost = ({route}) => {
             tintColor={COLORS.white}
             source={require('../constants/images/UIcons/left-arrow-6404.png')}/>
         </TouchableOpacity>
-        <Text style={styles.sectionHeader}>Create a Post</Text>
+        <Text style={styles.sectionHeader}>Create a Card</Text>
         <ScrollView contentContainerStyle={{alignItems: 'center'}}>
         
         <Modal
@@ -306,7 +308,7 @@ const CreatePost = ({route}) => {
         marginTop:10,
         alignSelf: 'center',
         textAlign:'center'
-            }}>Add Photos</Text>
+            }}>Add Photo</Text>
             <TouchableOpacity style={{
               alignContent:'center',
               width:'90%'
@@ -406,27 +408,11 @@ const CreatePost = ({route}) => {
 
         <View style={[ styles.sectionShadow , {
           borderRadius: 20,
-          height: 200,
+          height: 'auto',
           marginTop: 20,
           width: '95%',
           backgroundColor: COLORS.dark2
         }]}>
-          <Text style={styles.fieldDesc}>What type of post is this?</Text>
-          <View style={[styles.field]}>
-          <SelectList 
-        setSelected={(postType) => setPostType(postType)} 
-        data={postTypes} 
-        save="value"
-        inputStyles={{
-          color:COLORS.white
-        }}
-        dropdownStyles={{
-          backgroundColor:COLORS.white,
-          elevation:10,
-          zIndex:5
-        }}
-    />
-          </View>
 
           <View style={{
             width: '100%',
@@ -435,7 +421,7 @@ const CreatePost = ({route}) => {
           }}>
             <View style={[styles.safeContain, {flex:1, zIndex:-5}]}>
               <Text style={styles.fieldDesc}>Subject</Text>
-              <View style={[styles.field, {width:'90%'}]}>
+              <View style={[styles.field, {width:'90%', marginBottom: 20}]}>
               <SelectList 
         setSelected={(subject) => topicSelector(subject)} 
         data={subjects} 
@@ -454,7 +440,7 @@ const CreatePost = ({route}) => {
 
             <View style={[styles.safeContain, {flex:1, zIndex:-5}]}>
               <Text style={styles.fieldDesc}>Topic</Text>
-              <View style={[styles.field, {width:'90%'}]}>
+              <View style={[styles.field, {width:'90%', marginBottom: 20}]}>
               <SelectList 
         setSelected={(topic) => setTopic(topic)} 
         data={topicData}
@@ -480,7 +466,7 @@ const CreatePost = ({route}) => {
           width: '95%',
           backgroundColor: COLORS.dark2, zIndex:-5
         }]}>
-          <Text style={styles.fieldDesc}>Post Title</Text>
+          <Text style={styles.fieldDesc}>Question</Text>
           <View style={styles.field}>
           <TextInput 
             style={[styles.startInput,{color:COLORS.white}]}
@@ -489,15 +475,66 @@ const CreatePost = ({route}) => {
           />
           </View>
 
-          <Text style={styles.fieldDesc}>Add Description</Text>
-          <View style={[styles.field, {height:90}]}>
-          <TextInput 
-            style={[styles.startInput,{width: (width*0.95*0.95), height:'auto', color:COLORS.white}]}
-            onChangeText={descInput => onDescUpdate(descInput)}
-            defaultValue= {descInput}
-            multiline={true}
+          <Text style={[styles.fieldDesc, {marginBottom:3}]}>Answer Choices (Select the correct answer)</Text>
+          <ScrollView style={{}}>
+            <View style={styles.radioButton}> 
+                    <RadioButton.Android 
+                        value={1}
+                        status={selectedAnswer === 1 ?  
+                                'checked' : 'unchecked'} 
+                        onPress={() => setSelectedAnswer(1)} 
+                        color= {COLORS.wizBlue}
+                    /> 
+                    <TextInput 
+            style={[styles.fieldDesc,{color:COLORS.white, padding:15, paddingRight:45, margin:5}]}
+            onChangeText={option1 => onOption1Update(option1)}
+            defaultValue= {option1}
           />
-          </View>
+                </View> 
+  
+                <View style={styles.radioButton}> 
+                    <RadioButton.Android 
+                        value={2}
+                        status={selectedAnswer === 2 ?  
+                                 'checked' : 'unchecked'} 
+                        onPress={() => setSelectedAnswer(2)} 
+                        color={COLORS.wizBlue}
+                    /> 
+                    <TextInput 
+            style={[styles.fieldDesc,{color:COLORS.white, padding:15, paddingRight:45, margin:5}]}
+            onChangeText={option2 => onOption2Update(option2)}
+            defaultValue= {option2}
+          /> 
+                </View>
+                <View style={styles.radioButton}> 
+                    <RadioButton.Android 
+                        value={3}
+                        status={selectedAnswer === 3 ?  
+                                 'checked' : 'unchecked'} 
+                        onPress={() => setSelectedAnswer(3)} 
+                        color={COLORS.wizBlue}
+                    /> 
+                    <TextInput 
+            style={[styles.fieldDesc,{color:COLORS.white, padding:15, paddingRight:45, margin:5}]}
+            onChangeText={option3 => onOption3Update(option3)}
+            defaultValue= {option3}
+          /> 
+                </View>
+                <View style={styles.radioButton}> 
+                    <RadioButton.Android 
+                        value={4}
+                        status={selectedAnswer === 4 ?  
+                                 'checked' : 'unchecked'} 
+                        onPress={() => setSelectedAnswer(4)} 
+                        color={COLORS.wizBlue}
+                    /> 
+                    <TextInput 
+            style={[styles.fieldDesc,{color:COLORS.white, padding:15, paddingRight:45, margin:5}]}
+            onChangeText={option4 => onOption4Update(option4)}
+            defaultValue= {option4}
+          /> 
+                </View>
+            </ScrollView>
 
           <Text style={styles.fieldDesc}>Tag #1</Text>
           <View style={[styles.field]}>
@@ -549,7 +586,7 @@ const CreatePost = ({route}) => {
         zIndex: -10
         }}/>
 
-        <Text style={[styles.subSectionHeader,{zIndex: -10}]}>Add Photos ({(images.length)}/6)</Text>
+        <Text style={[styles.subSectionHeader,{zIndex: -10}]}>Add Photo</Text>
         <View style={{
             width: '100%',
             alignSelf:'center',
@@ -605,7 +642,7 @@ const CreatePost = ({route}) => {
                   height:28,
                   alignSelf:'center',
                   marginStart:20,
-                }}>Remove Last</Text>
+                }}>Remove</Text>
               </View>
             </TouchableOpacity>
         </View>
@@ -627,7 +664,7 @@ const CreatePost = ({route}) => {
     pagingEnabled={true}
     horizontal={true}
     scrollEventThrottle={16} >
-        {(images[0] == nullImage) && (<View style={{
+        {(image[0] == nullImage) && (<View style={{
           width: (width*81/100),
           marginLeft:(width*225/10000),
           marginRight:(width*225/10000)
@@ -640,7 +677,7 @@ const CreatePost = ({route}) => {
             source={nullImage}/>
         </View>)}
         
-        {images.map((image, index) => ((images[0] != nullImage) && (
+        {image.map((img, index) => ((image[0] != nullImage) && (
         <View style={{
           width: (width*81/100),
           marginLeft:(width*225/10000),
@@ -650,7 +687,7 @@ const CreatePost = ({route}) => {
             style={{ width: '100%', height: '100%', resizeMode:'contain'}}
             resizeMode="contain"
             borderRadius={30}
-            source={{ uri: image.uri }}/>
+            source={{ uri: img.uri }}/>
         </View>
         )))}
 </ScrollView>
@@ -701,4 +738,4 @@ const CreatePost = ({route}) => {
   )
 }
 
-export default CreatePost;
+export default CreateCard;
