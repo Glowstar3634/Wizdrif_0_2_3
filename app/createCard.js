@@ -171,7 +171,7 @@ const CreateCard = ({route}) => {
             xhr.send(null);
           });
 
-          const ref = firebase.storage().ref('images/cards/' + cardID).child('pic1');
+          const ref = firebase.storage().ref('images/cards/' + cardID).child('pic');
 
           await ref.put(blob);
         

@@ -14,6 +14,7 @@ class Card {
         this.views = views;
         this.private = false;
         this.tags = [];
+        this.image = [];
     }
 
     getCardID() {
@@ -105,6 +106,14 @@ class Card {
     }
     setHasPic(hasPic) {
         this.hasPic = hasPic;
+    }
+
+    getImage(){
+        return this.image;
+    }
+
+    setImage(img){
+        this.image = img;
     }
 
     getViews() {

@@ -179,6 +179,7 @@ const styles = StyleSheet.create({
         fontStyle: 'italic',
         alignContent: 'flex-start',
         marginTop:5,
+        marginBottom:10,
         marginStart:50,
         alignSelf: 'flex-start'
     },

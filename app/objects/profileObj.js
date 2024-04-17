@@ -1,6 +1,6 @@
 class Profile {
 
-    constructor(u, fn, ln, pw, e, a, g,acc,b,l,x,s,pf,f,p,r) {
+    constructor(u, fn, ln, pw, e, a, g,acc,b,l,x,s,pf,f,p,r,d) {
         if(arguments.length == 0){
             this.username = null;
             this.firstName = null;
@@ -14,6 +14,7 @@ class Profile {
             this.level = 0;
             this.xp = 0;
             this.strikes = 0;
+            this.district = "Rogue Student";
             this.pfp = null;
             this.friends = [];
             this.posts = [];
@@ -32,6 +33,7 @@ class Profile {
             this.level = u.level;
             this.xp = u.xp;
             this.strikes = u.strikes;
+            this.district = u.district;
             this.pfp = u.pfp;
             this.friends = u.friends;
             this.posts = u.posts;
@@ -50,6 +52,7 @@ class Profile {
             this.level = 0;
             this.xp = 0;
             this.strikes = 0;
+            this.district = "Rogue Student";
             this.pfp = null;
             this.friends = [];
             this.posts = [];
@@ -68,6 +71,7 @@ class Profile {
         this.level = l;
         this.xp = x;
         this.strikes = s;
+        this.district = d;
         this.pfp = pf;
         this.friends = f;
         this.posts = p;

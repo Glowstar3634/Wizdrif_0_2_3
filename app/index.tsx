@@ -23,6 +23,7 @@ import CardView from "./cardView";
 import Homework from "./homework";
 import CreatePost from "./createPost";
 import CreateCard from "./createCard";
+import Orbs from "./orbs";
 
 const Stack = createStackNavigator();
 const app = initializeApp(firebaseConfig);
@@ -46,6 +47,7 @@ const index = () => {
         <Stack.Screen name="createpost" component={CreatePost} />
         <Stack.Screen name="createcard" component={CreateCard} />
         <Stack.Screen name="homework" component={Homework} />
+        <Stack.Screen name="orbs" component={Orbs} />
         
       </Stack.Navigator>
   );

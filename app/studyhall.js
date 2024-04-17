@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView, StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ScrollView } from 'react-native'
+import { SafeAreaView, StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ScrollView, Modal , Dimensions } from 'react-native'
 import React from 'react'
 import styles from '../styles/search';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -10,9 +10,12 @@ import { COLORS } from '../constants';
 
 const Studyhall = ({route}) => {
   const { currentUser } = route.params;
+  const navigation = useNavigation();
   let currentXP = currentUser.getXp();
   let req = -1 * (Math.pow(1.04, ((-1 * currentUser.getLevel()) + 215.473))) + 5000;
   let xpProgress = currentXP/req;
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const { width, height } = Dimensions.get('window');
 
   return (
     <SafeAreaView style={{
@@ -20,6 +23,95 @@ const Studyhall = ({route}) => {
       display:'flex',
       backgroundColor: COLORS.dark
     }}>
+    <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          Alert.alert('Modal has been closed.');
+          setModalVisible(!modalVisible);
+        }}>
+        <View style={[styles.centeredView, {backgroundColor: 'rgba(0, 0, 0, 0.5)'}]}>
+          <View style={[styles.modalView, {width: (width*0.75)}]}>
+            <TouchableOpacity style={{
+              alignContent:'center',
+              width:'90%'
+            }} onPress={()=> {
+              setModalVisible(!modalVisible);
+              navigation.navigate("createpost", {currentUser: currentUser})}}>
+              <View style={[ styles.sectionShadow , {
+                borderRadius: 20,
+                height: 60,
+                marginTop: 20,
+                width: '90%',
+                alignSelf: 'center',
+                backgroundColor: COLORS.wizLBlue,
+                flexDirection:'row',
+                alignContent:'center'
+              }]}>
+                <Text style={{
+                  color: 'white', 
+                  fontSize: 20,
+                  width:'100%',
+                  fontWeight: 'bold',
+                  alignContent: 'center',
+                  height:28,
+                  alignSelf:'center',
+                  textAlign:'center'
+                }}>Post</Text>
+
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity style={{
+              alignContent:'center',
+              width:'90%'
+            }} onPress={()=> {
+              setModalVisible(!modalVisible);
+              navigation.navigate("createcard", {currentUser: currentUser})}}>
+              <View style={[ styles.sectionShadow , {
+                borderRadius: 20,
+                height: 60,
+                marginTop: 20,
+                width: '90%',
+                alignSelf: 'center',
+                backgroundColor: COLORS.wizPurp,
+                flexDirection:'row',
+                alignContent:'center'
+              }]}>
+                <Text style={{
+                  color: 'white', 
+                  fontSize: 20,
+                  width:'100%',
+                  fontWeight: 'bold',
+                  alignContent: 'center',
+                  height:28,
+                  alignSelf:'center',
+                  textAlign:'center'
+                }}>Flashcard</Text>
+
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity style={{
+              alignContent:'center',
+              width:'90%'
+            }} onPress={() => setModalVisible(false)}>
+              
+                <Text style={{
+                  color: 'gray', 
+                  fontSize: 20,
+                  width:'100%',
+                  fontWeight: 'bold',
+                  alignContent: 'center',
+                  height:28,
+                  alignSelf:'center',
+                  textAlign:'center',
+                  marginTop:20
+                }}>Cancel</Text>
+
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
       <View style={{
         flex: 10,
         margin:5,
@@ -158,7 +250,7 @@ const Studyhall = ({route}) => {
           justifyContent: 'space-between',
           backgroundColor: COLORS.dark2
         }, styles.sectionShadow]}>
-        <TouchableOpacity style={[styles.safeContain, {width:'15%',justifyContent: 'center', margin:6}]}>
+        <TouchableOpacity style={[styles.safeContain, {width:'15%',justifyContent: 'center', margin:6}]} onPress={()=> navigation.navigate("classroom", {currentUser: currentUser})}>
         <Image
             style={{  width: '60%', height: '60%', alignSelf:"center",padding:10}}
             tintColor={COLORS.white}
@@ -166,7 +258,7 @@ const Studyhall = ({route}) => {
             resizeMode="contain"
         />
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.safeContain, {width:'15%',justifyContent: 'center', margin:6}]}>
+        <TouchableOpacity style={[styles.safeContain, {width:'15%',justifyContent: 'center', margin:6}]} onPress={()=> navigation.navigate("studyhall", {currentUser: currentUser})}>
         <Image
             style={{  width: '60%', height: '60%', alignSelf:"center",padding:10}}
             tintColor={COLORS.white}
@@ -174,7 +266,7 @@ const Studyhall = ({route}) => {
             resizeMode="contain"
         />
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.safeContain, {width:'15%',justifyContent: 'center', margin:-2}]}>
+        <TouchableOpacity style={[styles.safeContain, {width:'15%',justifyContent: 'center', margin:-2}]} onPress={() => setModalVisible(true)}>
         <Image
             style={{  width: '100%', height: '100%', alignSelf:"center",padding:10}}
             tintColor={COLORS.white}
@@ -182,7 +274,7 @@ const Studyhall = ({route}) => {
             resizeMode="contain"
         />
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.safeContain, {width:'15%',justifyContent: 'center', margin:6}]}>
+        <TouchableOpacity style={[styles.safeContain, {width:'15%',justifyContent: 'center', margin:6}]} onPress={()=> navigation.navigate("wizwar", {currentUser: currentUser})}>
         <Image
             style={{  width: '60%', height: '60%', alignSelf:"center",padding:10}}
             tintColor={COLORS.white}
@@ -190,7 +282,7 @@ const Studyhall = ({route}) => {
             resizeMode="contain"
         />
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.safeContain, {width:'15%',justifyContent: 'center', margin:6}]}>
+        <TouchableOpacity style={[styles.safeContain, {width:'15%',justifyContent: 'center', margin:6}]} onPress={()=> navigation.navigate("notebook", {currentUser: currentUser})}>
         <Image
             style={{  width: '60%', height: '60%', alignSelf:"center",padding:10}}
             tintColor={COLORS.white}

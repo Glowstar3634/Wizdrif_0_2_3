@@ -48,7 +48,6 @@ const CreatePost = ({route}) => {
   const nullImage = require('../constants/images/UIcons/photos-10614.png');
   const [images, onImagesUpdate] = React.useState([nullImage]);
   const [modalVisible, setModalVisible] = React.useState(false);
-
   const [postType, setPostType] = React.useState("");
   const [subject, setSubject] = React.useState("");
   const [topicData, setTopicData] = React.useState(noTopics);

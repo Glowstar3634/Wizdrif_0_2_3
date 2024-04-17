@@ -11,6 +11,8 @@ class Post {
         this.postID = '';
         this.private = false;
         this.tags = [];
+        this.images = [];
+
     }
 
     getPoster() {
@@ -41,6 +43,10 @@ class Post {
         return this.description;
     }
 
+    getImages() {
+        return this.images;
+    }
+
     getLikes() {
         return this.likes;
     }
@@ -61,6 +67,10 @@ class Post {
         this.postID = postID;
     }
 
+    setLikes(like){
+        this.likes = like;
+    }
+
     like() {
         this.likes++;
     }
@@ -73,8 +83,24 @@ class Post {
         this.pics = pics;
     }
 
+    setPoster(p){
+        this.poster = p;
+    }
+
     setTags(tag) {
         this.tags = tag;
+    }
+
+    setImages(img) {
+        this.images = img;
+    }
+
+    addImages(img) {
+        (this.images).push(img);
+    }
+
+    addTags(tag) {
+        (this.tags).push(tag);
     }
 
     setPrivate(priv) {
