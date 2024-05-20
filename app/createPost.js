@@ -57,6 +57,7 @@ const CreatePost = ({route}) => {
   const [tags2, setTags2] = React.useState("");
   const postTags = [];
   const toggleSwitch = () => setPostPrivate(previousState => !previousState);
+  
 
   const create = async () => {
     console.log('Checking...');

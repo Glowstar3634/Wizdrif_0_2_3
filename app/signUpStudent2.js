@@ -13,6 +13,7 @@ import {signOut, onAuthStateChanged, signInWithEmailAndPassword, getAuth, create
 
 const SignUpStudent2 = ({ route }) => {
   const { newAccount } = route.params;
+  console.log(newAccount);
   const navigation = useNavigation();
   const [usernameInput, onUsernameUpdate] = React.useState('');
   const [emailInput, onEmailUpdate] = React.useState('');
@@ -76,23 +77,17 @@ function passwordCheck(txt) {
         newAccount.setUsername(usernameInput);
         newAccount.setEmail(emailInput);
         newAccount.setPassword(passwordInput);
-        const currentUser = new Profile();
-        currentUser.setUsername(newAccount.getUsername());
-        currentUser.setEmail(newAccount.getEmail());
-        currentUser.setPassword(newAccount.getPassword());
-        currentUser.setFirstName(newAccount.getFirstName());
-        currentUser.setLastName(newAccount.getLastName());
-        currentUser.setAccount(newAccount.getAccount());
-        currentUser.setAge(newAccount.getAge());
-        currentUser.setGrade(newAccount.getGrade());
-
+        console.log(newAccount.getUsername());
+        console.log('Creating User 0...');
+        
+        console.log('Creating User 2...');
         await createUserWithEmailAndPassword(getAuth(), emailInput, passwordInput);
         console.log('User created successfully!');
-        const reference = ref(database, 'users/' + currentUser.username);
-        set(reference, currentUser)
+        const reference = ref(database, 'users/' + newAccount.getUsername());
+        set(reference, newAccount)
         .then(() => {
           console.log('Profile data successfully saved to Firebase');
-          navigation.navigate("classroom", {currentUser: currentUser});
+          navigation.navigate("classroom", {currentUser: newAccount});
         })
         .catch((error) => {
           console.error('Error saving profile data:', error);

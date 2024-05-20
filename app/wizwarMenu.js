@@ -261,7 +261,7 @@ const WizWar = ({route}) => {
           alignSelf:'center',
           flexDirection:'column',
           backgroundColor: COLORS.dark2
-        }]}>
+        }]} onPress={()=> navigation.navigate("duelprep", {currentUser: currentUser, opponent: null, rankLock: false})}>
         <Image
             style={{  width: '230%', height: '230%',flex:6, alignSelf:"center"}}
             source={require('../constants/images/Icons/Quick-Duels.png')}
