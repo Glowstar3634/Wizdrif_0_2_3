@@ -9,7 +9,9 @@ class DuelState {
         guestMP = 100,
         guestMPR = 15,
         guestDmg = 1,
-        guestDef = 1
+        guestDef = 1,
+        hostTurn = true,
+        relicSlots = 3
     ) {
         this.hostHP = hostHP;
         this.hostMP = hostMP;
@@ -22,6 +24,9 @@ class DuelState {
         this.guestMPR = guestMPR;
         this.guestDmg = guestDmg;
         this.guestDef = guestDef;
+
+        this.hostTurn = hostTurn
+        this.relicSlots = relicSlots
     }
 
     // Getters
@@ -65,6 +70,14 @@ class DuelState {
         return this.guestDef;
     }
 
+    getHostTurn() {
+        return this.hostTurn;
+    }
+
+    getRelicSlots() {
+        return this.relicSlots;
+    }
+
     // Setters
     setHostHP(value) {
         this.hostHP = value;
@@ -104,6 +117,14 @@ class DuelState {
 
     setGuestDef(value) {
         this.guestDef = value;
+    }
+
+    setHostTurn(value) {
+        this.hostTurn = value;
+    }
+
+    setRelicSlots(value) {
+        this.relicSlots = value;
     }
 }
 

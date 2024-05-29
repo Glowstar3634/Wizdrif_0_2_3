@@ -42,7 +42,9 @@ const DuelPrep = ({route}) => {
   const [swapType, setSwapType] = React.useState("Add");
 
   const [myQR, setMyQR] = React.useState(null);
+  const [myQRkey, setMyQRkey] = React.useState(null);
   const [matchedQR, setMatchedQR] = React.useState(null);
+  const [matchedQRkey, setMatchedQRkey] = React.useState(null);
   const [matchObj, setMatchObj] = React.useState(null);
   const [matched, setMatched] = React.useState(false);
 
@@ -61,7 +63,6 @@ const DuelPrep = ({route}) => {
                 queueData.guestLoad,
                 queueData.ready
             );
-            console.log((currentUser.getUsername() + "'s guest: " + queueObj.getGuest()));
             return queueObj;
         }
         return null;
@@ -161,11 +162,11 @@ const DuelPrep = ({route}) => {
     };
     
     fetchMatchObj();
-}, [matchedQR]);
-  
+  }, [matchedQR]);
+  let tempreq = null;
   React.useEffect(() => {
     if (myQR) {
-        console.log("myQR has been set:", myQR);
+        setMyQRkey(tempreq);
         findADuel();
     }
 }, [myQR]);
@@ -236,7 +237,7 @@ const DuelPrep = ({route}) => {
   };
 
   const queueUp = () => {
-    if (loadout != ["0-0","0-0","0-0","0-0","0-0","0-0","0-0"]){
+    if (!loadout.every(item => item === "0-0")){
       if (loadout.indexOf("0-0") !== -1) {
         // Are you sure? (You don't have a full loadout)
         console.warn("Incomplete loadout");
@@ -248,8 +249,9 @@ const DuelPrep = ({route}) => {
         set(queueReference, duelqueueObj)
           .then(() => {
             setModal3Visible(true);
+            tempreq = matchReq;
+            setMyQRkey(matchReq)
             setMyQR(queueReference);
-            console.log("queueReference:", queueReference);
           })
           .catch(error => {
             console.error("Error setting queue reference:", error);
@@ -263,12 +265,15 @@ const DuelPrep = ({route}) => {
       stopListeningForChildChanges();
       await remove(myQR);
       setMyQR(null);
+      setMyQRkey(null);
       setModal3Visible(false);
     }else{
       stopListeningForChildChanges();
       await remove(matchedQR);
       setMyQR(null);
+      setMyQRkey(null);
       setMatchedQR(null);
+      setMatchedQRkey(null);
       setMatchObj(null);
       setMatched(false);
       setModal3Visible(false);
@@ -299,7 +304,9 @@ const DuelPrep = ({route}) => {
                 await set(matchedLoad, myQueueReq.hostLoad); 
                 await remove(myQR);
                 setMyQR(null);
+                setMyQRkey(null);
                 setMatched(true);
+                setMatchedQRkey(queueReqKey);
                 setMatchedQR(ref(database, "queue/" + queueReqKey));
                 getReady();
                 break;
@@ -345,29 +352,27 @@ const DuelPrep = ({route}) => {
     if (snapshot.exists){
       const matchData = snapshot.val();
       setModal3Visible(false);
-      setModal4Visible(true);
       if (matchData.ready === 0 || matchData.ready == undefined){
         set(child(matchedQR, "ready"), 1)
         .then(() =>{
           startWaitForOpp();
+          setModal4Visible(true);
         })
       } else if (matchData.ready === 1) {
         set(child(matchedQR, "ready"), 2)
         .then(async () => {
         const finalQR = await QR2obj(matchedQR);
         stopWaitForOpp();
+        setModal4Visible(false);
+        navigation.navigate("duelscreen", {currentUser: currentUser, settings: finalQR, req: matchedQRkey});
         
-        setModal4Visible(false);
-        navigation.navigate("duelscreen", {currentUser: currentUser, settings: finalQR});
-        setModal4Visible(false);
         })
       } else if (matchData.ready === 2) {
         const finalQR = await QR2obj(matchedQR);
         stopWaitForOpp();
+        setModal4Visible(false);
+        navigation.navigate("duelscreen", {currentUser: currentUser, settings: finalQR, req: matchedQRkey});
         
-        setModal4Visible(false);
-        navigation.navigate("duelscreen", {currentUser: currentUser, settings: finalQR});
-        setModal4Visible(false);
         
       } else{
         set(child(matchedQR, "ready"), 1)
@@ -411,8 +416,8 @@ const DuelPrep = ({route}) => {
       if (changedReq === 2) {
         const finalQR = await QR2obj(matchedQR);
         stopWaitForOpp();
-        navigation.navigate("duelscreen", {currentUser: currentUser, settings: finalQR});
         setModal4Visible(false);
+        navigation.navigate("duelscreen", {currentUser: currentUser, settings: finalQR, req: matchedQRkey});
       }
   };
 
@@ -421,6 +426,7 @@ const DuelPrep = ({route}) => {
     if (changedReq !== "") {
       setMatched(true);
       setMatchedQR(myQR);
+      setMatchedQRkey(myQRkey);
       const obj = await QR2obj(myQR);
       setMatchObj(obj);
       getReady();
@@ -434,7 +440,7 @@ const DuelPrep = ({route}) => {
       backgroundColor: COLORS.dark
     }}>
     <Modal
-        animationType="fade"
+        animationType="none"
         transparent={true}
         visible={modal4Visible}
         onRequestClose={() => {

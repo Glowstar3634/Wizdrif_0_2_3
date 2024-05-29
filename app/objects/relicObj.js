@@ -68,6 +68,50 @@ class Relic {
         return allRelicNames[sub][num];
     }
 
+    static cool(relicID) {
+        const names1 = [4, 3, 4];
+        const names2 = [1, 0, 2];
+        const names3 = [0, 0, 0];
+        const names4 = [1, 2, 2];
+        const names5 = [2, 3, 2, 2];
+        const names6 = [1, 3, 3];
+        const names7 = [1, 2, 2, 0];
+        const names8 = [6, 6];
+    
+        const allRelicNames = [names1, names2, names3, names4, names5, names6, names7, names8];
+    
+        const sub = parseInt(relicID.split('-')[0]) - 1;
+        const num = parseInt(relicID.split('-')[1]) - 1;
+    
+        if (relicID === "0-0") {
+            return 0;
+        }
+    
+        return allRelicNames[sub][num];
+    }
+
+    static mana(relicID) {
+        const names1 = [64, 25, 49];
+        const names2 = [30, 20, 15];
+        const names3 = [10, 18, 20];
+        const names4 = [20, 10, 30];
+        const names5 = [15, 15, 25, 25];
+        const names6 = [30, 25, 30];
+        const names7 = [18, 21, 15, 16];
+        const names8 = [30, 30];
+    
+        const allRelicNames = [names1, names2, names3, names4, names5, names6, names7, names8];
+    
+        const sub = parseInt(relicID.split('-')[0]) - 1;
+        const num = parseInt(relicID.split('-')[1]) - 1;
+    
+        if (relicID === "0-0") {
+            return 0;
+        }
+    
+        return allRelicNames[sub][num];
+    }
+
     static desc(relicID) {
         const names1 = ["Math relic. Gives the opponent no solution, and skips their next turn. They will also take 12 damage.", "Math relic. Oscillates your damage by 30% for this, and your next three turns (+,-,+,-)", "Math relic. User can use the imaginary axis to evade attacks."];
         const names2 = ["Science relic. Causes a fiery blast that deals 25 damage to the opponent.", "Science relic. Crashes the opponent into the ground dealing 18 damage.", "Science relic. Decreases the user’s debuffs by 50%."];
@@ -89,8 +133,7 @@ class Relic {
     
         return allRelicNames[sub][num];
     }
-      
-
+    
     getRelicID() {
         return this.relicID;
     }

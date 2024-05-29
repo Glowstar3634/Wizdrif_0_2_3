@@ -34,7 +34,8 @@ const index = () => {
   
   return (
       <Stack.Navigator initialRouteName="start" screenOptions={{
-        headerShown: false
+        headerShown: false,
+        gestureEnabled: false
       }}>
         <Stack.Screen name="start" component={Start} />
         <Stack.Screen name="signUp1" component={SignUp1} />
