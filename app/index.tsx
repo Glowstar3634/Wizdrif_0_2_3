@@ -30,7 +30,6 @@ import DuelScreen from "./duelScreen";
 const Stack = createStackNavigator();
 const app = initializeApp(firebaseConfig);
 const index = () => {
-  const navigation = useRouter();
   
   return (
       <Stack.Navigator initialRouteName="start" screenOptions={{

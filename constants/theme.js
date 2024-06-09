@@ -19,6 +19,7 @@ const COLORS = {
   
   white: "#FFFFFFFF",
   red: "#A0281F",
+  yellow: "#FFFF00",
 
   wizBlue: "#2023FFFF",
   wizBlueLight: "#BDC9FFFF",
