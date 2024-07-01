@@ -26,6 +26,7 @@ import CreateCard from "./createCard";
 import Orbs from "./orbs";
 import DuelPrep from "./duelprep";
 import DuelScreen from "./duelScreen";
+import Relics from "./relics";
 
 const Stack = createStackNavigator();
 const app = initializeApp(firebaseConfig);
@@ -50,6 +51,7 @@ const index = () => {
         <Stack.Screen name="createcard" component={CreateCard} />
         <Stack.Screen name="homework" component={Homework} />
         <Stack.Screen name="orbs" component={Orbs} />
+        <Stack.Screen name="relics" component={Relics} />
         <Stack.Screen name="duelprep" component={DuelPrep} />
         <Stack.Screen name="duelscreen" component={DuelScreen} />
         

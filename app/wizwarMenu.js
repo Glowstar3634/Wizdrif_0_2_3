@@ -217,7 +217,7 @@ const WizWar = ({route}) => {
           alignSelf:'center',
           flexDirection:'column',
           backgroundColor: COLORS.dark2
-        }]}>
+        }]} onPress={()=> navigation.navigate("relics", {currentUser: currentUser})}>
         <Image
             style={{  width: '275%', height: '275%',flex:6, alignSelf:"center"}}
             source={require('../constants/images/Icons/My Relics.png')}

@@ -119,8 +119,8 @@ class Relic {
         const names4 = ["Social Studies relic. Lose 20 hp, but increase damage by 20% on this and the next turn.", "Social Studies relic. Decreases your mana by 65%(after cost), but increases the damage of your next turn by 65%.", "Social Studies relic. Steal 15 hp from your opponent."];
         const names5 = ["Business and Economics relic. Regenerates the user's health by 15", "Business and economics relic. Strengthens the user, they now take 10% less damage from all sources.", "Business and Economics relic. Damages the opponent over the span of 3 turns. 10 hp per turn.", "Business and Economics relic. Increases the mana cost for your opponent’s next move by 25%."];
         const names6 = ["Engineering relic. Slams the ground and deals 25 damage to the opponent.", "Engineering relic. Weakens the opponent, they now take 10% more damage from all sources.", "Engineering relic. Deals 20 damage to your opponent, and gives them only two relic slots on their next turn."];
-        const names7 = ["Lets you use an extra, random relic from your opponent on your next turn.", "Programming relic. One of your opponent’s next relics will have no effect.", "Programming relic. Reflects damage exceeding 12 from your opponents next turn back to them.", "Deals a random amount of damage ranging from 5-30."];
-        const names8 = ["Removes 70% of your opponents mana, and gives them only two relic slots on their next turn.", "Headache - Deals a maximum of 80 damage, minus your opponent's debuffs and minus their missing mana."];
+        const names7 = ["Lets you use an extra, random relic from your opponent on your next turn.", "Programming relic. One of your opponent’s next relics will have no effect.", "Programming relic. Reflects damage exceeding 12 from your opponents next turn back to them.", "Deals a random amount of damage ranging from 5-25."];
+        const names8 = ["Removes 70% of your opponents mana, and gives them only two relic slots on their next turn.", "Headache - Deals a maximum of 75 damage, minus your opponent's debuffs and minus their missing mana."];
     
         const allRelicNames = [names1, names2, names3, names4, names5, names6, names7, names8];
     
@@ -129,6 +129,28 @@ class Relic {
     
         if (relicID === "0-0") {
             return "";
+        }
+    
+        return allRelicNames[sub][num];
+    }
+
+    static effect(relicID) {
+        const names1 = [["Skipped Turn\nDealt 12 damage"], ["+30% DMG","-60% DMG","+60% DMG","-60% DMG","+30% DMG"], ["++Dodge Chance"]];
+        const names2 = [["Dealt 25 Damage"], ["Deals 18 Damage"], ["Decreased user debuffs"]];
+        const names3 = [["Can see opponent's loadout."], ["Swaps two relics from inventory"], ["+8 MP Regen"]];
+        const names4 = [["-20 HP\n+20 DMG","-20 DMG"], ["-65% Remaining MP", "+65% DMG", "-65% DMG"], ["Deals 15 Damage\nHeals 15 HP"]];
+        const names5 = [["Heals 15 HP"], ["+10% DEF"], ["Deals 10 Damage", "Deals 10 Damage", "Deals 10 Damage"], ["+25% Opponent\nMP Cost", "-25% Opponent\nMP Cost"]];
+        const names6 = [["Deals 25 Damage"], ["-10% Opponent DEF"], ["Deals 20 Damage\nLimit opponent relics to 2"]];
+        const names7 = [["+X% DMG\n-X% DEF", "-X% DMG\n+X% DEF"], ["Breaks one of opponents next relics."], ["Reflects excessive dammage\non opponent's next turn", "Deals X Damage"], ["Deals X Damage"]];
+        const names8 = [["Removes 70% opponent MP\nLimit opponent relics to 2"], ["Deals X Damage"]];
+    
+        const allRelicNames = [names1, names2, names3, names4, names5, names6, names7, names8];
+    
+        const sub = parseInt(relicID.split('-')[0]) - 1;
+        const num = parseInt(relicID.split('-')[1]) - 1;
+    
+        if (relicID === "0-0") {
+            return [""];
         }
     
         return allRelicNames[sub][num];

@@ -36,6 +36,11 @@ const DuelScreen = ({route}) => {
     const [playedRelics, setPlayedRelics] = React.useState(["0-0","0-0","0-0"]);
     const [playSelection, setPlaySelection] = React.useState(["0-0","0-0","0-0"]);
     const [selectedRelic, setSelectedRelic] = React.useState("0-0");
+    const [theirEffects, setTheirEffects] = React.useState(["","",""]);
+    const [myEffects, setMyEffects] = React.useState(["","",""]);
+    const [effects, setEffects] = React.useState(["","",""]);
+
+    const [showEffects, setShowEffects] = React.useState(false);
     const [hostActiveRelics, setHostActiveRelics] = React.useState([]);
     const [guestActiveRelics, setGuestActiveRelics] = React.useState([]);
 
@@ -46,30 +51,59 @@ const DuelScreen = ({route}) => {
   
     const isHost = (currentUser.getUsername() == settings.host) ? true : false;
     
-    
+    const matchRef = ref(database, "match/" + req); // Adjust 'req' as necessary
 
+    let childChangedListener = onChildChanged(matchRef, handleMatchUpdate);
+    var isListenerActive = false;
+
+    
     const listenForOpponent = () => {
       listenTime = d.getTime();
-      onChildChanged(ref(database, ("match/" + req)), handleMatchUpdate)
-      console.log(currentUser.getUsername() + " is listening...")
-    }
-
+      console.log(`${currentUser.getUsername()} is listening...`);
+      
+      // Ensure no duplicate listeners
+      if (!isListenerActive) {
+        childChangedListener = onChildChanged(ref(database, "match/" + req), handleMatchUpdate);
+        isListenerActive = true;
+      }
+    };
+    
     const stopListenForOpponent = () => {
-      off(ref(database, ("match/" + req)), handleMatchUpdate)
-      console.log(currentUser.getUsername() + " stopped listening.")
-    }
+      console.log(`${currentUser.getUsername()} stopped listening.`);
+      off(ref(database, "match/" + req), 'child_changed', handleMatchUpdate);
+      isListenerActive = false; // Reset listener active status
+    };
+    
+
 
     const handleMatchUpdate = async(data) => {
       if(!myTurn){
         const changedReq = data.val();
+        console.log("Received Data! " + currentUser.getUsername())
       if (data.key > listenTime){
-        console.log("new data dif " + (data.key - listenTime) + "=" + changedReq.play + ": " + currentUser.getUsername())
         if((changedReq.player == "Host") == !isHost){
-          setTheirPlays(prevPlays => [...prevPlays, [changedReq.play[0], changedReq.play[1], changedReq.play[2]]]); // Update state correctly
+          setTheirPlays(prevPlays => [...prevPlays, [changedReq.play[0], changedReq.play[1], changedReq.play[2]]])
+          console.log("TheirPlays! " + currentUser.getUsername())
         }
         setPlayedRelics([changedReq.play[0],changedReq.play[1],changedReq.play[2]])
-        
-        console.log("The state: " + changedReq.state)
+
+        if (!changedReq.state) {
+          console.error("State is undefined or null", changedReq);
+          return; // Skip processing if state is invalid
+        }
+    
+        const requiredProps = [
+          'hostHP', 'hostMP', 'hostMPR', 'hostDmg', 'hostDef',
+          'guestHP', 'guestMP', 'guestMPR', 'guestDmg', 'guestDef',
+          'hostTurn', 'relicSlots', 'hostActives', 'guestActives'
+        ];
+    
+        let missingProps = requiredProps.filter(prop => changedReq.state[prop] === undefined);
+        if (missingProps.length > 0) {
+          console.error("Missing or undefined properties in state:", missingProps);
+          return; // Skip processing if properties are missing
+        }
+
         const newState = new DuelState(
           changedReq.state.hostHP,
           changedReq.state.hostMP,
@@ -87,17 +121,19 @@ const DuelScreen = ({route}) => {
           changedReq.state.guestActives
         )
         setGameState(newState)
+        console.log("Update! " + currentUser.getUsername())
         if (newState.getHostTurn() === isHost){
           setMyTurn(true);
-          console.log("It's your turn, " + currentUser.getUsername() + "!")
           stopListenForOpponent();
+          console.log("Stopped Listening! " + currentUser.getUsername())
         }else{
           setMyTurn(false);
-          console.log("It's no longer your turn, " + currentUser.getUsername() + ".")
           listenForOpponent();
+          console.log("Started Listening! " + currentUser.getUsername())
         }
         setHostActiveRelics(Array.from(changedReq.state.hostActives))
         setGuestActiveRelics(Array.from(changedReq.state.guestActives))
+        console.log("Actives! " + currentUser.getUsername())
       }
       }else{
         console.log("It's already your turn, no need to update yet, " + currentUser.getUsername() + "!")
@@ -105,24 +141,49 @@ const DuelScreen = ({route}) => {
     }
 
     React.useEffect(() => {
-      if (isHost && !matchCreated) {
-        const matchRef = ref(database, "match/" + req + "/" + d.getTime() + "/state");
-        const startState = new DuelState();
-        set(matchRef, startState)
-          .then(() => {
-            console.log("Match created, hosted by " + currentUser.getUsername());
-            setMyTurn(true);
-            setMatchCreated(true);
-            listenForOpponent();
-          });
-      } else if (!isHost) {
-        listenForOpponent();
-      }
+  if (isHost && !matchCreated) {
+    const matchRef = ref(database, "match/" + req + "/" + d.getTime() + "/state");
+    const startState = new DuelState();
+    set(matchRef, startState).then(() => {
+      console.log("Match created, hosted by", currentUser.getUsername());
+      setMyTurn(true);
+      setMatchCreated(true);
+      listenForOpponent();
+    });
+  } else if (!isHost) {
+    listenForOpponent();
+  }
+
+  return () => {
+    stopListenForOpponent(); 
+  };
+}, []);
+
+
+    const retrieveEffects = (relics, mine) => {
+      const newEffects = [
+        Relic.effect(relics[0])[0],
+        Relic.effect(relics[1])[0],
+        Relic.effect(relics[2])[0]
+      ];
     
-      return () => {
-        stopListenForOpponent(); // Clean up the listener on unmount
-      };
-    }, []);
+      // Update the effects state
+      setEffects(newEffects);
+    
+      // Use a callback to ensure the effects state is updated before setting showEffects to true
+      setShowEffects(true);
+    };
+
+    React.useEffect(() => {
+      if (showEffects) {
+        const timeoutId = setTimeout(() => {
+          setShowEffects(false);
+        }, 6000);
+        
+        clearTimeout(timeoutId);
+      }
+      return
+    }, [showEffects]);
 
     const selectRelic = (relic) => {
       let newSelection = [];
@@ -132,62 +193,64 @@ const DuelScreen = ({route}) => {
         newSelection.push(relic)
         newSelection.push("0-0")
         newSelection.push("0-0")
-        console.log("relic added to first slot")
         setPlaySelection(newSelection)
       }
       else if(playSelection.indexOf("0-0") == 1){
         newSelection.push(playSelection[0])
         newSelection.push(relic)
         newSelection.push("0-0")
-        console.log("relic added to second slot")
         setPlaySelection(newSelection)
       }
       else if(playSelection.indexOf("0-0") == 2){
         newSelection.push(playSelection[0])
         newSelection.push(playSelection[1])
         newSelection.push(relic)
-        console.log("relic added to third slot")
         setPlaySelection(newSelection)
       }
       else if(playSelection.indexOf("0-0") == -1){
         newSelection.push(playSelection[1])
         newSelection.push(playSelection[2])
         newSelection.push(relic)
-        console.log("relic pushed to last slot")
         setPlaySelection(newSelection)
       }
     }
 
     const playRelics = () => {
-      console.log("Playing relics...");
       animateRelicPlay();
       const check = checkRelics();
+      console.log("Check! " + currentUser.getUsername())
       if (check == "!") {
         const time = d.getTime();
         const playerRef = ref(database, "match/" + req + "/" + time + "/player");
         const playRef = ref(database, "match/" + req + "/" + time + "/play");
         const stateRef = ref(database, "match/" + req + "/" + time + "/state");
+        console.log("Refs! " + currentUser.getUsername())
         set(playerRef, isHost ? "Host" : "Guest")
           .then(() => {
-            return set(playRef, playSelection);
+            console.log("Player! " + currentUser.getUsername())
+            return set(playRef, playSelection);//Playing the relics
           })
           .then(() => {
+            console.log("Relics! " + currentUser.getUsername())
             setPlayedRelics(playSelection);
-            const newState = calculateRelics(gameState, isHost);
-            return set(stateRef, newState);
+            console.log("Selection! " + currentUser.getUsername())
+            const newState = calculateRelics(gameState, isHost); 
+            console.log("Calculation! " + currentUser.getUsername())
+            return set(stateRef, newState); //Updating the state
           })
           .then(() => {
-            console.log("All relics played");
-            setMyPlays(prevPlays => [...prevPlays, playSelection]);
+            console.log("Update! " + currentUser.getUsername())
+            setMyPlays((prevMyPlays) => [...prevMyPlays, playSelection]);
+            console.log("MyPlays! " + currentUser.getUsername())
             setPlaySelection(["0-0", "0-0", "0-0"]);
             if (newState.getHostTurn() == isHost) {
               setMyTurn(true);
-              console.log("It's your turn, " + currentUser.getUsername() + "!");
-              stopListenForOpponent();
+              stopListenForOpponent()
+              console.log("Stopped Listening! " + currentUser.getUsername())
             } else {
               setMyTurn(false);
-              console.log("It's no longer your turn, " + currentUser.getUsername() + ".");
               listenForOpponent();
+              console.log("Started Listening! " + currentUser.getUsername())
             }
           });
       } else {
@@ -195,6 +258,17 @@ const DuelScreen = ({route}) => {
         setPlaySelection(["0-0", "0-0", "0-0"]);
       }
     };
+
+    function hasDuplicates(array) {
+      const elementCount = {};
+      for (let element of array) {
+          if (elementCount[element] && element != "0-0") {
+              return true; // Duplicate found
+          }
+          elementCount[element] = 1;
+      }
+      return false;
+    }
 
     const checkRelics = () => {
       //Checking total mana cost of the play
@@ -226,10 +300,15 @@ const DuelScreen = ({route}) => {
         }
       }
 
+      //Checking duplicate relics
+      if (hasDuplicates(playSelection)){ 
+        return "You cannot play duplicate relics!"
+      }
+
       //Checking cooldown conditions
       for(let i = 0; i < 3; i++){
         //checking single use of english relic
-        if(parseInt(playSelection[i].split('-')[0]) - 1 == 3){
+        if(parseInt(playSelection[i].split('-')[0]) == 3){
           for (const play of myPlays){
             for(let j = 0; j < 3; j++){
               if(play[j] == playSelection[i]){
@@ -240,7 +319,7 @@ const DuelScreen = ({route}) => {
         }
 
         //checking for enabled specials
-        if(parseInt(playSelection[i].split('-')[0]) - 1 == 8 && myPlays.length < 5){
+        if(parseInt(playSelection[i].split('-')[0]) == 8 && myPlays.length < 5){
           return "You cannot play a Special relic until your 6th turn!"
         }
 
@@ -268,6 +347,7 @@ const DuelScreen = ({route}) => {
       let totalManaChange = 0;
       let manaMulti = 1;
 
+      console.log("PreCalc! " + currentUser.getUsername())
       //Pre-calc relic effects
       for(let p = 0; p < theirPlays.length; p++){
         for(let r = 0; r < 3; r++){
@@ -296,6 +376,7 @@ const DuelScreen = ({route}) => {
         }
       }
       
+      console.log("Calc! " + currentUser.getUsername())
       //Calculating relic effects
       for(let i = 0; i < currentState.relicSlots; i++){
         let selection = playSelection[i];
@@ -728,7 +809,7 @@ const DuelScreen = ({route}) => {
           }
         } else if (selection === "7-4") {
           console.log("Handling 7-4");
-          let damage = Math.floor(Math.random() * 26) + 5;
+          let damage = Math.floor(Math.random() * 21) + 5;
           if(isHost){
             //Effects
             totalDamage += damage*currentState.hostDmg/currentState.guestDef;
@@ -761,13 +842,13 @@ const DuelScreen = ({route}) => {
           console.log("Handling 8-2");
           if(isHost){
             //Effects
-            totalDamage += (80 - (currentState.guestDmg < 1 ? (1 - currentState.guestDmg)*10 : 0) - (currentState.guestDef < 1 ? (1 - currentState.guestDef)*10 : 0))*currentState.hostDmg/currentState.guestDef;
+            totalDamage += (80 - (currentState.guestDmg < 1 ? (1 - currentState.guestDmg)*10 : 0) - (currentState.guestDef < 1 ? (1 - currentState.guestDef)*10 : 0) - (100 - currentState.guestMP))*currentState.hostDmg/currentState.guestDef;
 
             //Mana Costs
             currentState.setHostMP(currentState.hostMP - Relic.mana("8-2")*manaMulti)
           }else{
             //Effects
-            totalDamage += (80 - (currentState.hostDmg < 1 ? (1 - currentState.hostDmg)*10 : 0) - (currentState.hostDef < 1 ? (1 - currentState.hostDef)*10 : 0))*currentState.guestDmg/currentState.hostDef;
+            totalDamage += (80 - (currentState.hostDmg < 1 ? (1 - currentState.hostDmg)*10 : 0) - (currentState.hostDef < 1 ? (1 - currentState.hostDef)*10 : 0) - (100 - currentState.hostMP))*currentState.guestDmg/currentState.hostDef;
 
             //Mana Costs
             currentState.setGuestMP(currentState.guestMP - Relic.mana("8-2")*manaMulti)
@@ -775,8 +856,8 @@ const DuelScreen = ({route}) => {
         }
       }
 
+      console.log("PostCalc! " + currentUser.getUsername())
       //Post-calc relic effects
-      console.error(myPlays)
       for(let p = 0; p < myPlays.length; p++){
         for(let r = 0; r < 3; r++){
           let playsAgo = 99;
@@ -899,6 +980,7 @@ const DuelScreen = ({route}) => {
         }
       }
 
+      console.log("Dealing Damage! " + currentUser.getUsername())
       //Deal Damage
       if(isHost){
         if(currentState.guestHP > totalDamage){
@@ -914,11 +996,13 @@ const DuelScreen = ({route}) => {
         }
       }
 
+      console.log("Turn Switch! " + currentUser.getUsername())
       //Turn Switch
       if(!skip){
         currentState.setHostTurn(isHost ? false : true)
       }
 
+      console.log("Mana Regen! " + currentUser.getUsername())
       //Mana Regen
       if(isHost){
         if(currentState.guestMP < 100-currentState.guestMPR){
@@ -1106,6 +1190,11 @@ const DuelScreen = ({route}) => {
     </View>
   ))}
           </View>
+          <View style={{flexDirection: "row", justifyContent: 'space-around', width:"100%", opacity:(showEffects ? 1: 0)}}> 
+          {(theirEffects[0] != "") && (<Text style={[styles.sectionHeader, {alignSelf:'center',marginStart: 0, fontSize: 12, alignItems:'center', textAlign:'center'}]}>{theirEffects[0]}</Text>)}
+          {(theirEffects[0] != "") && (<Text style={[styles.sectionHeader, {alignSelf:'center',marginStart: 0, fontSize: 12, alignItems:'center', textAlign:'center'}]}>{theirEffects[1]}</Text>)}
+          {(theirEffects[0] != "") && (<Text style={[styles.sectionHeader, {alignSelf:'center',marginStart: 0, fontSize: 12, alignItems:'center', textAlign:'center'}]}>{theirEffects[2]}</Text>)}
+          </View>
           <View style={{flexDirection:'row'}}> 
           {Array.from({ length: 3 }, (_, i) => (
     <View key={i} style={{
@@ -1125,6 +1214,11 @@ const DuelScreen = ({route}) => {
       />
     </View> 
   ))}
+          </View>
+          <View style={{flexDirection: "row", justifyContent: 'space-around', width:"100%", opacity:(showEffects ? 1: 0)}}> 
+            {(effects[0] != "") && (<Text style={[styles.sectionHeader, {alignSelf:'center',marginStart: 0, fontSize: 15, alignItems:'center', textAlign:'center'}]}>{effects[0]}</Text>)}
+            {(effects[1] != "") && (<Text style={[styles.sectionHeader, {alignSelf:'center',marginStart: 0, fontSize: 15, alignItems:'center', textAlign:'center'}]}>{effects[1]}</Text>)}
+            {(effects[2] != "") && (<Text style={[styles.sectionHeader, {alignSelf:'center',marginStart: 0, fontSize: 15, alignItems:'center', textAlign:'center'}]}>{effects[2]}</Text>)}
           </View>
           <View style={{flexDirection:'row', height: 60}}> 
           {Array.from({ length: (isHost ? hostActiveRelics.length : guestActiveRelics.length) }, (_, i) => (
@@ -1147,10 +1241,60 @@ const DuelScreen = ({route}) => {
     </View>
   ))}
           </View>
+          <View style={{flexDirection: "row", justifyContent: 'space-around', width:"100%", opacity:(showEffects ? 1: 0)}}> 
+          {(myEffects[0] != "") && (<Text style={[styles.sectionHeader, {alignSelf:'center',marginStart: 0, fontSize: 12, alignItems:'center', textAlign:'center'}]}>{myEffects[0]}</Text>)}
+          {(myEffects[1] != "") && (<Text style={[styles.sectionHeader, {alignSelf:'center',marginStart: 0, fontSize: 12, alignItems:'center', textAlign:'center'}]}>{myEffects[1]}</Text>)}
+          {(myEffects[2] != "") && (<Text style={[styles.sectionHeader, {alignSelf:'center',marginStart: 0, fontSize: 12, alignItems:'center', textAlign:'center'}]}>{myEffects[2]}</Text>)}
+          </View>
+          
         </View>
 
-        <View style={{flex:1, flexDirection: "row", justifyContent: 'space-evenly'}}>
-        <View style={{flexDirection:'row', width: '50%'}}> 
+        <View style={{flex:1, flexDirection: "row", justifyContent: 'space-evenly', alignItems: 'center', width: "100%"}}>
+        <TouchableOpacity style={{height:'100%', alignItems:'center', justifyContent:'center'}} onPress={() => {}}>
+           <View style={[ styles.sectionShadow , {
+                borderRadius: 20,
+                height:'80%',
+                width:50,
+                padding:5,
+                opacity: (myTurn ? 1 : 0.5),
+                alignSelf: 'center',
+                backgroundColor: COLORS.dark1,
+                borderWidth:2,
+                borderColor:COLORS.gray2,
+                flexDirection:'row',
+                alignContent:'center'
+              }]}>
+                <Image
+            style={{  width: "100%", height: '100%', alignSelf:"flex-start"}}
+            tintColor={COLORS.white}
+            source={require('../constants/images/UIcons/icons8-flag-96.png')}
+            />
+
+              </View>
+           </TouchableOpacity>
+           <TouchableOpacity style={{height:'100%', alignItems:'center', justifyContent:'center'}} onPress={() => {}}>
+           <View style={[ styles.sectionShadow , {
+                borderRadius: 20,
+                height:'80%',
+                width:50,
+                padding:5,
+                opacity: (myTurn ? 1 : 0.5),
+                alignSelf: 'center',
+                backgroundColor: COLORS.dark1,
+                borderWidth:2,
+                borderColor:COLORS.gray2,
+                flexDirection:'row',
+                alignContent:'center'
+              }]}>
+                <Image
+            style={{  width: "100%", height: '100%', alignSelf:"flex-start"}}
+            tintColor={COLORS.white}
+            source={require('../constants/images/UIcons/icons8-handshake-90.png')}
+            />
+
+              </View>
+           </TouchableOpacity>
+        <View style={{flexDirection:'row', width: '40%'}}> 
           {Array.from({ length: 3 }, (_, i) => (
     <TouchableOpacity key={i} style={{
       flex:1,
@@ -1188,14 +1332,14 @@ const DuelScreen = ({route}) => {
               }]}>
                 <Text style={{
                   color: 'white', 
-                  fontSize: 20,
+                  fontSize: 15,
                   width:'auto',
                   fontWeight: 'bold',
                   alignContent: 'center',
                   alignSelf:'center',
                   textAlign:'center',
-                  paddingLeft: 25,
-                  paddingRight: 25
+                  paddingLeft: 15,
+                  paddingRight: 15
                 }}>CONFIRM</Text>
 
               </View>
@@ -1205,7 +1349,6 @@ const DuelScreen = ({route}) => {
 
         <View style={{
           flex:3,
-          marginTop:5,
           width:'95%',
           flexDirection:'row',
           alignItems:'center',

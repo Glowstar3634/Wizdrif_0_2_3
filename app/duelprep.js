@@ -163,6 +163,7 @@ const DuelPrep = ({route}) => {
     
     fetchMatchObj();
   }, [matchedQR]);
+  
   let tempreq = null;
   React.useEffect(() => {
     if (myQR) {
