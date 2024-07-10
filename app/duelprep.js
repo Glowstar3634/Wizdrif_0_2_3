@@ -1084,7 +1084,7 @@ const DuelPrep = ({route}) => {
         alignItems: 'center'
       }}>
       <TouchableOpacity
-          style={{alignSelf:'left', position:'absolute'}}
+          style={{alignSelf:'flex-start', position:'absolute'}}
           onPress={() => navigation.goBack()}
         >
             <Image

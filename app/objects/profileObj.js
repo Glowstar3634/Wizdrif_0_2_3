@@ -14,7 +14,27 @@ class Profile {
             this.level = 0;
             this.xp = 0;
             this.strikes = 0;
-            this.district = "Rogue Student";
+            this.district = {
+                "name": "Rogue Student",
+                "description": "This user has not joined a district",
+                "tags": [],
+                "owner": "",
+                "settings": {
+                    "private": false,
+                    "maxMembers": -1,
+                    "allowedAccounts": [],
+                    "levelReq": 0,
+                    "official": false,
+                    "verified": false,
+                    "inviteOnly": false
+                },
+                "members": [],
+                "admins": [],
+                "districtID": "",
+                "hasIcon": false,
+                "level": 0,
+                "xp": 0
+              };
             this.pfp = null;
             this.friends = [];
             this.posts = [];
@@ -52,7 +72,27 @@ class Profile {
             this.level = 0;
             this.xp = 0;
             this.strikes = 0;
-            this.district = "Rogue Student";
+            this.district = {
+                "name": "Rogue Student",
+                "description": "This user has not joined a district",
+                "tags": [],
+                "owner": "",
+                "settings": {
+                    "private": false,
+                    "maxMembers": -1,
+                    "allowedAccounts": [],
+                    "levelReq": 0,
+                    "official": false,
+                    "verified": false,
+                    "inviteOnly": false
+                },
+                "members": [],
+                "admins": [],
+                "districtID": "",
+                "hasIcon": false,
+                "level": 0,
+                "xp": 0
+              };
             this.pfp = null;
             this.friends = [];
             this.posts = [];

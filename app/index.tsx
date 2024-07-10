@@ -9,7 +9,6 @@ import { COLORS } from '../constants';
 import firebaseConfig from "../FirebaseConfig";
 import { initializeApp } from "@firebase/app";
 
-
 import SignUp1 from "./signUp1";
 import SignUpStudent from './signUpStudent';
 import SignUpStudent2 from './signUpStudent2';
@@ -27,6 +26,9 @@ import Orbs from "./orbs";
 import DuelPrep from "./duelprep";
 import DuelScreen from "./duelScreen";
 import Relics from "./relics";
+import CreateDistrict from "./createDistrict";
+import CreateGroup from "./createGroup";
+import SearchHall from "./searchHall";
 
 const Stack = createStackNavigator();
 const app = initializeApp(firebaseConfig);
@@ -54,6 +56,9 @@ const index = () => {
         <Stack.Screen name="relics" component={Relics} />
         <Stack.Screen name="duelprep" component={DuelPrep} />
         <Stack.Screen name="duelscreen" component={DuelScreen} />
+        <Stack.Screen name="createdistrict" component={CreateDistrict} />
+        <Stack.Screen name="creategroup" component={CreateGroup} />
+        <Stack.Screen name="searchhall" component={SearchHall} />
         
       </Stack.Navigator>
   );

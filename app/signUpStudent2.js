@@ -79,7 +79,6 @@ function passwordCheck(txt) {
         newAccount.setPassword(passwordInput);
         console.log(newAccount.getUsername());
         console.log('Creating User 0...');
-        
         console.log('Creating User 2...');
         await createUserWithEmailAndPassword(getAuth(), emailInput, passwordInput);
         console.log('User created successfully!');

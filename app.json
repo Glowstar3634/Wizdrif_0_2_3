@@ -35,7 +35,8 @@
           "cameraPermission": "Allow Wizdrif to access your camera",
           "microphonePermission": "Allow Wizdrif to access your microphone"
         }
-      ]
+      ],
+      "expo-font"
     ]
   }
 }
