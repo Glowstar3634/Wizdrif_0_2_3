@@ -50,7 +50,6 @@ const Classroom = ({route}) => {
   let xpProgress = currentXP/req;
   const { width, height } = Dimensions.get('window');
 
-
   const viewPostsIn = () => {
     if (postType == "Any" && subject == "All Subjects"){
       navigation.navigate("postview", {currentUser: currentUser, menu: shortenedMenu, type: "All", label: "All Subjects"});

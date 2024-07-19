@@ -29,6 +29,9 @@ import Relics from "./relics";
 import CreateDistrict from "./createDistrict";
 import CreateGroup from "./createGroup";
 import SearchHall from "./searchHall";
+import DistrictView from "./districtView";
+import GroupView from "./groupView";
+import ProfileScreen from "./profileView";
 
 const Stack = createStackNavigator();
 const app = initializeApp(firebaseConfig);
@@ -59,6 +62,9 @@ const index = () => {
         <Stack.Screen name="createdistrict" component={CreateDistrict} />
         <Stack.Screen name="creategroup" component={CreateGroup} />
         <Stack.Screen name="searchhall" component={SearchHall} />
+        <Stack.Screen name="districtview" component={DistrictView} />
+        <Stack.Screen name="groupview" component={GroupView} />
+        <Stack.Screen name="profileview" component={ProfileScreen} />
         
       </Stack.Navigator>
   );

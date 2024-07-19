@@ -54,7 +54,6 @@ const styles = StyleSheet.create({
         color: COLORS.primary
     },
     header1: {
-        fontFamily: FONT.bold,
         fontSize: SIZES.large,
         color: COLORS.primary,
         textAlign: 'center'
@@ -274,7 +273,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 22,
+      },
+      modalHeader: {
+              
       }
+      
 });
 
 export default styles;

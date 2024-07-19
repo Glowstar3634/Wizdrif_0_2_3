@@ -117,7 +117,7 @@ const CardView = ({route}) => {
             justifyContent:'space-evenly'
           }}>
           <Text style={styles.postHeaderRight}>District</Text>
-          <Text style={styles.postHeaderRight}>{card.getPoster().getDistrict()}</Text>
+          <Text style={styles.postHeaderRight}>{card.getPoster().getDistrict().name}</Text>
           </View>
           </View>{/* Post Header */}
           

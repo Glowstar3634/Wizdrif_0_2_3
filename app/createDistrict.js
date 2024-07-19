@@ -32,7 +32,7 @@ import { Buffer } from 'buffer';
 import Post from "./objects/postObj";
 import {Profile} from './objects/profileObj';
 import { auth, database, storage, firebase } from '../firebase';
-import {ref, set} from 'firebase/database';
+import {ref, set, get} from 'firebase/database';
 
 
 const CreateDistrict = ({route}) => {
@@ -87,6 +87,23 @@ const CreateDistrict = ({route}) => {
     "hasIcon": false,
     "level": 0,
     "xp": 0
+  }
+  var groupJSON = {
+    "name": "",
+    "description": "",
+    "tags": [],
+    "owner": "",
+    "settings": {
+        "private": false,
+        "maxMembers": -1,
+        "allowedAccounts": [],
+        "levelReq": 0,
+        "inviteOnly": false
+    },
+    "members": [],
+    "admins": [],
+    "groupID": "",
+    "district": null
   }
 
 
@@ -164,6 +181,23 @@ const CreateDistrict = ({route}) => {
       alert('District Name must be between 5-75 characters');
       return;
     }
+    try {
+      const districtsRef = ref(database, 'districts');
+      const snapshot = await get(districtsRef);
+      if (snapshot.exists()) {
+        const districts = snapshot.val();
+        for (const districtId in districts) {
+          if (districts[districtId].name.toLowerCase() === titleInput.trim().toLowerCase()) {
+            alert('The district name is already taken. Please choose a different name.');
+            return;
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error checking district names: ', error);
+      alert('An error occurred while checking district names. Please try again.');
+      return;
+    }
     if (!descInput.trim()) {
       alert('Please enter a description for your district');
       return;
@@ -226,13 +260,13 @@ const CreateDistrict = ({route}) => {
     console.log('Tags:', postTags.length);
 
     uploadPost();
-  
-    // confirmPostCreation
   };
 
   const uploadPost = async () =>{
     let d = new Date();
     let districtID = "district" + d.getTime() + "=" + currentUser.getUsername();
+    let groupID = "group" + d.getTime() + "=" + currentUser.getUsername();
+
     districtJSON.name = titleInput.trim();
     districtJSON.description = descInput.trim();
     districtJSON.owner = currentUser.getUsername();
@@ -252,11 +286,29 @@ const CreateDistrict = ({route}) => {
     }
 
 
+    groupJSON.district = districtID
+
+    groupJSON.name = "General Chat";
+    groupJSON.description = "Main chat group for " + titleInput.trim() + ".";
+    groupJSON.owner = currentUser.getUsername();
+    groupJSON.settings.private = true;
+    groupJSON.settings.maxMembers = -1;
+    groupJSON.settings.allowedAccounts = allowedAccounts;
+    groupJSON.settings.levelReq = 0;
+    groupJSON.settings.inviteOnly = true; 
+    groupJSON.members = [currentUser.getUsername()];
+    groupJSON.admins = [currentUser.getUsername()];
+    groupJSON.groupID = groupID;
+
+    districtJSON.group = groupJSON;
+
+
     const userPostRef = ref(database, 'users/' + currentUser.getUsername()+ "/district");
     const pubPostRef = ref(database, 'districts/' + districtID);
+    const groupRef = ref(database, 'groups/' + groupID);
     set(userPostRef, districtJSON) //Publishing to user post reference
     .then(async() => {
-        currentUser.setDistrict(titleInput)
+        currentUser.setDistrict(districtJSON)
       console.log('District successfully saved to user reference');
 
       if (image[0] != nullImage){ //Uploading images
@@ -283,7 +335,15 @@ const CreateDistrict = ({route}) => {
       if(true){ 
         set(pubPostRef, districtJSON) //Publishing to public posts reference
         .then(async() => {
+          set(groupRef, groupJSON) //Publishing to public posts reference
+        .then(async() => {
           alert('District created successfully to Wizdrif server');
+          navigation.goBack()
+        })
+        .catch((error) => {
+          console.error('Error making group data public:', error);
+        });
+          navigation.goBack()
         })
         .catch((error) => {
           console.error('Error making district data public:', error);
@@ -680,13 +740,13 @@ const CreateDistrict = ({route}) => {
                 alignSelf: 'center',
                 backgroundColor: COLORS.gray2,
                 flexDirection:'row',
-                alignContent:'center'
+                alignItems:'center'
               }]}>
                 <Text style={{
                   color: 'white', 
                   fontSize: 20,
                   fontWeight: 'bold',
-                  alignContent: 'flex-start',
+                  alignItems: 'flex-start',
                   marginTop:0,
                   height:28,
                   alignSelf:'center',
@@ -704,13 +764,13 @@ const CreateDistrict = ({route}) => {
                 alignSelf: 'center',
                 backgroundColor: COLORS.gray2,
                 flexDirection:'row',
-                alignContent:'center'
+                alignItems:'center'
               }]}>
                 <Text style={{
                   color: 'white', 
                   fontSize: 20,
                   fontWeight: 'bold',
-                  alignContent: 'flex-start',
+                  alignItems: 'flex-start',
                   marginTop:0,
                   height:28,
                   alignSelf:'center',
@@ -728,13 +788,13 @@ const CreateDistrict = ({route}) => {
                 alignSelf: 'center',
                 backgroundColor: COLORS.gray2,
                 flexDirection:'row',
-                alignContent:'center'
+                alignItems:'center'
               }]}>
                 <Text style={{
                   color: 'white', 
                   fontSize: 20,
                   fontWeight: 'bold',
-                  alignContent: 'flex-start',
+                  alignItems: 'flex-start',
                   marginTop:0,
                   height:28,
                   alignSelf:'center',

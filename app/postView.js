@@ -109,7 +109,7 @@ const PostView = ({route}) => {
   justifyContent:'space-evenly'
 }}>
 <Text style={styles.postHeaderRight}>District</Text>
-<Text style={styles.postHeaderRight}>{post.getPoster().getDistrict()}</Text>
+<Text style={styles.postHeaderRight}>{post.getPoster().getDistrict().name}</Text>
 </View>
 </View>
 

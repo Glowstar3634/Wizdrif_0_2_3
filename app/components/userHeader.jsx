@@ -17,12 +17,12 @@ const UserHeader = (currentUser) => {
   let req = -1 * (Math.pow(1.04, ((-1 * currentUser.getLevel()) + 215.473))) + 5000;
   let xpProgress = currentXP/req;
   return (
-    <View style={{
+    <TouchableOpacity style={{
         flex: 10,
         margin:5,
         flexDirection: "row",
         justifyContent:'flex-start'
-      }}>
+      }} onPress={navigation.navigate("profileview", {currentUser: currentUser, userView: currentUser})}>
         <Image
             style={{  width: 50, height: '100%', alignSelf:"flex-start"}}
             tintColor={COLORS.white}
@@ -45,8 +45,7 @@ const UserHeader = (currentUser) => {
         <Progress.Bar style={{color:'#FFFFFF'}} progress={xpProgress} color='#FFFFFF' width={200} />
 
       </View>
-{/* Navigation drawer add*/}
-      </View>
+      </TouchableOpacity>
   )
 }
 

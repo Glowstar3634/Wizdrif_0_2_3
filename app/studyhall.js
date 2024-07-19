@@ -23,25 +23,88 @@ const Studyhall = ({route}) => {
   
   const [modalVisible, setModalVisible] = React.useState(false);
   const { width, height } = Dimensions.get('window');
+  const disPicRadius = ((width - 20) * 0.225 / 2)+10
+  const [myGroups, setMyGroups] = React.useState([]);
   const [district, setDistrict] = React.useState("Rogue Student");
   const [districtJSON, setDistrictJSON] = React.useState({
-    "name": "District Name",
-    "members": {
+    "name": "Rogue Student",
+    "description": "This user has not joined a district",
+    "tags": [],
+    "owner": "",
+    "settings": {
+        "private": false,
+        "maxMembers": -1,
+        "allowedAccounts": [],
+        "levelReq": 0,
+        "official": false,
+        "verified": false,
+        "inviteOnly": false
     },
-    "level": 0
+    "members": [],
+    "admins": [],
+    "districtID": "",
+    "hasIcon": false,
+    "level": 0,
+    "xp": 0
   });
   const [districtXP, setDistrictXP] = React.useState(0);
   const [loaded, setLoaded] = React.useState(false);
+  const [districtIconUrl, setDistrictIconUrl] = React.useState('');
+
+const districtIcon = async (id) => {
+  const ref = firebase.storage().ref('images/districts/' + id).child('coverIcon');
+  try {
+    const url = await ref.getDownloadURL();
+    console.log('getting downloadURL of image success');
+    setDistrictIconUrl(url);
+  } catch (e) {
+    console.log('getting downloadURL of image error => ', e);
+  }
+};
+
+React.useEffect(() => {
+  if (districtJSON.hasIcon && districtJSON.districtID) {
+    districtIcon(districtJSON.districtID);
+  }
+}, [districtJSON]);
+
+  const truncateString = (str, n) => {
+    if (!str) {
+      return '';
+    }
+    return str.length > n ? str.slice(0, n) + '...' : str;
+  };
+
+  React.useEffect(() => {
+    const fetchGroups = async () => {
+      try {
+        const groupsRef = ref(database, `users/${currentUser.getUsername()}/groups`);
+        const snapshot = await get(groupsRef);
+
+        if (snapshot.exists()) {
+          const groups = snapshot.val();
+          const groupsArray = Object.keys(groups).map(key => groups[key]);
+          setMyGroups(groupsArray);
+        } else {
+          console.log("No groups found");
+        }
+      } catch (error) {
+        console.error("Error fetching groups: ", error);
+      }
+    };
+
+    fetchGroups();
+  }, []);
 
   React.useEffect(() => { async function fetchData()  {
     console.log("loading district")
-    const userDistrict = currentUser.getDistrict().name;
-    setDistrict(userDistrict);
-    
-    console.log("awaiting...")
-    const theD = await get(ref(database, "districts/" + currentUser.getDistrict().districtID));
+    if (currentUser.getDistrict() != "Rogue Student"){
+      const theD = await get(ref(database, "districts/" + currentUser.getDistrict().districtID));
     if(theD.exists()){
       setDistrictJSON(theD.val())
+      
+    const userDistrict = currentUser.getDistrict().name;
+    setDistrict(userDistrict);
       setLoaded(true)
       console.log("district loaded")
     
@@ -53,7 +116,57 @@ const Studyhall = ({route}) => {
       setDistrictXP(dXPP)
     } else{
       console.log("district doesn't exist")
+      currentUser.setDistrict({
+        "name": "Rogue Student",
+        "description": "This user has not joined a district",
+        "tags": [],
+        "owner": "",
+        "settings": {
+            "private": false,
+            "maxMembers": -1,
+            "allowedAccounts": [],
+            "levelReq": 0,
+            "official": false,
+            "verified": false,
+            "inviteOnly": false
+        },
+        "members": [],
+        "admins": [],
+        "districtID": "",
+        "hasIcon": false,
+        "level": 0,
+        "xp": 0
+      })
+      setDistrict("Rogue Student")
+      setLoaded(true)
     }
+    }else{
+      console.log("district doesn't exist")
+      currentUser.setDistrict({
+        "name": "Rogue Student",
+        "description": "This user has not joined a district",
+        "tags": [],
+        "owner": "",
+        "settings": {
+            "private": false,
+            "maxMembers": -1,
+            "allowedAccounts": [],
+            "levelReq": 0,
+            "official": false,
+            "verified": false,
+            "inviteOnly": false
+        },
+        "members": [],
+        "admins": [],
+        "districtID": "",
+        "hasIcon": false,
+        "level": 0,
+        "xp": 0
+      })
+      setDistrict("Rogue Student")
+      setLoaded(true)
+    }
+    
   } fetchData()
   }, []);
 
@@ -131,7 +244,7 @@ const Studyhall = ({route}) => {
             />
         
         <View style={{flex:6, alignItems: 'center'}}>
-        <Text style={{fontSize: 15, fontStyle: 'italic', color: COLORS.gray1}}>Search districts, groups, people...
+        <Text style={{fontSize: 15, fontStyle: 'italic', color: COLORS.gray1}}>Search new districts, groups, people...
         </Text>
         </View>
         </TouchableOpacity>
@@ -175,7 +288,7 @@ const Studyhall = ({route}) => {
               alignContent:'center',
               width: '90%'
             }} onPress={()=> {
-              navigation.navigate("createpost", {currentUser: currentUser})}}>
+              navigation.navigate("searchhall", {currentUser: currentUser})}}>
               <View style={[ styles.sectionShadow , {
                 borderRadius: 20,
                 width: '80%',
@@ -211,14 +324,19 @@ const Studyhall = ({route}) => {
             flexDirection: 'column',
             alignSelf: 'center'
           }}>
-          <View style={{flex: 3, flexDirection: 'row'}}>
-          <View style={{alignItems: "center", justifyContent: "center", marginTop: 5, flex: 1}}>
-          <Image
-            style={{  width: '90%', aspectRatio: 1, alignSelf:"center",padding:10}}
+          <View style={{flex: 3, flexDirection: 'row', justifyContent: 'center'}}>
+          <View style={{alignItems: "flex-end", justifyContent: "center", marginTop: 5, width:'auto', borderRadius: (disPicRadius), borderWidth: 2, borderColor: COLORS.white, padding: 3}}>
+          {!districtJSON.hasIcon || districtIconUrl == '' && (<Image
+            style={{  height: '100%', aspectRatio: 1, alignSelf:"center", borderRadius: (disPicRadius+20)}}
             tintColor={COLORS.white}
             source={require('../constants/images/UIcons/team-5704.png')}
             resizeMode="contain"
-        />
+        />)}
+        {districtJSON.hasIcon && districtIconUrl != '' && (<Image
+            style={{  height: '100%', aspectRatio: 1, alignSelf:"center", borderRadius: (disPicRadius+20)}}
+            source={{uri: districtIconUrl }}
+            resizeMode="contain"
+        />)}
           </View>
           <View style={{alignItems: "center", justifyContent: "center", marginTop: 5, flex: 3}}>
             <Text style={[styles.header1, {fontSize: 22, color: COLORS.white, fontWeight: 700}]}>{district}</Text>
@@ -226,12 +344,12 @@ const Studyhall = ({route}) => {
             <Progress.Bar style={{color:'#FFFFFF', marginTop: 10}} progress={districtXP} color='#FFFFFF' width={200} />
           </View>
           </View>
-          <View style={{flex:1, flexDirection:'row', justifyContent: 'center'}}>
+          <View style={{flex:1, flexDirection:'row', justifyContent: 'center', marginTop: 10}}>
           <TouchableOpacity style={{
               alignContent:'center',
               width: '90%'
             }} onPress={()=> {
-              navigation.navigate("createpost", {currentUser: currentUser})}}>
+              navigation.navigate("districtview", {currentUser: currentUser, district: districtJSON})}}>
               <View style={[ styles.sectionShadow , {
                 borderRadius: 20,
                 width: '80%',
@@ -297,7 +415,7 @@ const Studyhall = ({route}) => {
               alignContent:'center',
               width: '50%'
             }} onPress={()=> {
-              navigation.navigate("creategroup", {currentUser: currentUser})}}>
+              navigation.navigate("creategroup", {currentUser: currentUser, district: null})}}>
               <View style={[ styles.sectionShadow , {
                 borderRadius: 20,
                 width: '80%',
@@ -322,9 +440,79 @@ const Studyhall = ({route}) => {
             </TouchableOpacity>
         </View>
 
-        <View style={{alignItems: "flex-start", justifyContent: "center", marginTop: 5, width: '100%'}}>
-            <Text style={[styles.sectionHeader, {fontSize: 22, color: COLORS.white, marginStart: 25, fontWeight: 500}]}>Groups</Text>
+          <View style={{alignItems: "flex-start", justifyContent: "center", marginTop: 5, width: '100%'}}>
+            <Text style={[styles.sectionHeader, {fontSize: 22, color: COLORS.white, marginStart: 25, fontWeight: 500}]}>My Groups</Text>
           </View>
+
+          {myGroups.map((group, index) => ((
+            <TouchableOpacity style={[ styles.sectionShadow , {
+          borderRadius: 20,
+          height: 'auto',
+          marginTop: 20,
+          width: '95%',
+          backgroundColor: COLORS.dark2
+        }]} key={index} onPress={() => {navigation.navigate("groupview", {currentUser: currentUser, group: group})}}>
+
+          <View style={{
+            justifyContent:'space-between',
+            alignItems: 'center',
+            flex: 1,
+            margin: 10,
+            flexDirection: 'column',
+            alignSelf: 'center'
+          }}>
+          <View style={{flex: 3, flexDirection: 'row'}}>
+          <View style={{alignItems: "center", justifyContent: "center", marginRight: 15, flex: 1}}>
+          <Image
+            style={{  width: '90%', aspectRatio: 1, alignSelf:"center",padding:10}}
+            tintColor={COLORS.white}
+            source={require('../constants/images/UIcons/team-5704.png')}
+            resizeMode="contain"
+        />
+          </View>
+          <View style={{alignItems: "flex-start", justifyContent: "center", marginTop: 5, flex: 3}}>
+            <Text style={[styles.header1, {fontSize: 22, color: COLORS.white, fontWeight: 700, marginBottom: 5}]}>{group.name}</Text>
+            <Text style={[styles.header1, {fontSize: 14, color: COLORS.white, fontWeight: 400, marginBottom: 20}]}>{truncateString(group.description, 45)}</Text>
+            <Text style={[styles.header1, {fontSize: 15, color: COLORS.white, fontWeight: 400, marginBottom: 10}]}>Members: {Array.isArray(group.members) ? group.members.length : 0}</Text>
+            <ScrollView style={{
+            width: '100%',
+            height:'auto',
+            flexDirection:'row',
+            margin:5
+          }} horizontal={true}>{/* Post Tags */}
+            {Array.isArray(group.tags) ? group.tags.map((tag, index2) => (
+                    <View 
+                      style={{
+                        width: 'auto',
+                        height: '100%',
+                        backgroundColor: COLORS.wizBlue,
+                        borderRadius: 15,
+                        alignItems: 'center',
+                        marginRight: 10,
+                        padding: 5,
+                      }} 
+                      key={index2}
+                    >
+                      <Text 
+                        style={{
+                          textAlign: 'center',
+                          fontWeight: 'bold',
+                          alignContent: 'center',
+                          margin: 0,
+                          color: COLORS.white
+                        }}
+                      >
+                        {tag}
+                      </Text>
+                    </View>
+                  )) : null}
+          </ScrollView>{/* Post Tags */}
+          </View>
+          </View>
+          
+          </View>
+        </TouchableOpacity>
+          )))}
         </ScrollView>
 
       </View>
