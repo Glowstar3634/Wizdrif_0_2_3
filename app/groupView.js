@@ -31,8 +31,26 @@ const GroupView = ({route}) => {
   const [modal4Visible, setModal4Visible] = React.useState(false);
   const [modal5Visible, setModal5Visible] = React.useState(false);
   const [modal6Visible, setModal6Visible] = React.useState(false);
+  
+  const [pfpUrls, setpfpUrls] = React.useState([]);
+
 
   const groupRef = ref(database, "groups/" + loadedGroup.groupID)
+
+  const fetchPFPIcons = async () => {
+    const iconUrls = await Promise.all(Object.values(loadedGroup.members || {}).map(async (member) => {
+        const ref = firebase.storage().ref(`images/users/${member}`).child('pfp');
+        try {
+          const url = await ref.getDownloadURL();
+          console.log(member)
+          return url;
+        } catch (e) {
+          console.log('User has no pfp: ', e);
+          return null;
+        }
+    }));
+    setpfpUrls(iconUrls);
+  };
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -136,6 +154,7 @@ const sendMessage = async () => {
 
     const newMessage = {
         user: currentUser.getUsername(),
+        icon: currentUser.getPfp(),
         text: message.trim(),
         timestamp: Date.now()
     };
@@ -169,12 +188,17 @@ const sendMessage = async () => {
             {Array.isArray(Object.values(loadedGroup.members || {})) && Object.values(loadedGroup.members || {}).map((member, index) => (
               <View style={{width: '100%', height: 50, flexDirection: 'row', alignItems:'center'}} key={index}>
               <Text style={[styles.header1,{fontSize: 16, color: 'gray', marginEnd: 20}]}>{index+1}</Text>
-              <Image
-                                    style={{ width: 35, aspectRatio: 1, alignSelf: "center", borderRadius: width, borderColor: COLORS.white, borderWidth: 1, marginEnd: 10}}
-                                    tintColor={COLORS.white}
-                                    source={require('../constants/images/UIcons/icons8-person-64.png')}
-                                    resizeMode="contain"
-                                />
+              {!pfpUrls[index] && <Image
+                style={{ width: 35, aspectRatio: 1, alignSelf: "center", borderRadius: width, borderColor: COLORS.white, borderWidth: 1, marginEnd: 10}}
+                tintColor={COLORS.white}
+                source={require('../constants/images/UIcons/icons8-person-64.png')}
+                resizeMode="contain"
+                />}
+                {pfpUrls[index] && <Image
+                style={{ width: 35, aspectRatio: 1, alignSelf: "center", borderRadius: width, borderColor: COLORS.white, borderWidth: 1, marginEnd: 10}}
+                source={{uri: pfpUrls[index]}}
+                resizeMode="contain"
+                />}
               <Text style={[styles.header1,{fontSize: 16, color: COLORS.white}]}>{member}</Text>
               </View>
             ))}
@@ -389,13 +413,18 @@ const sendMessage = async () => {
                             textAlign: 'left',
                         }}>{msg.user}</Text>
                         <View style={{ flexDirection: 'row', alignItems: 'flex-start' , width: width-60, alignSelf:(msg.user == currentUser.getUsername() ? 'flex-end' : 'flex-start'), justifyContent: (msg.user == currentUser.getUsername() ? 'flex-end' : 'flex-start')}}>
-                            {(msg.user != currentUser.getUsername()) && <View style={{ alignItems: "flex-end", justifyContent: "center", width: 30, height: 30, borderRadius: (width), borderWidth: 1, borderColor: COLORS.white, padding: 3 }}>
-                                <Image
+                            {(msg.user != currentUser.getUsername()) && <View style={{ alignItems: "flex-end", justifyContent: "center", width: 30, height: 30, borderRadius: (width), borderWidth: 1, borderColor: COLORS.white, padding: 1 }}>
+                                {!msg.icon && <Image
                                     style={{ height: '100%', aspectRatio: 1, alignSelf: "center", borderRadius: width }}
                                     tintColor={COLORS.white}
                                     source={require('../constants/images/UIcons/icons8-person-64.png')}
                                     resizeMode="contain"
-                                />
+                                />}
+                                {msg.icon && <Image
+                                    style={{ height: '100%', aspectRatio: 1, alignSelf: "center", borderRadius: width }}
+                                    source={{uri: msg.icon}}
+                                    resizeMode="contain"
+                                />}
                             </View>}
                             <Text style={{
                                 color: 'white',
@@ -407,13 +436,18 @@ const sendMessage = async () => {
                                 alignSelf: 'flex-start',
                                 textAlign: (msg.user == currentUser.getUsername() ? 'right' : 'left') ,
                             }}>{msg.text}</Text>
-                            {(msg.user == currentUser.getUsername()) && <View style={{ alignItems: "flex-end", justifyContent: "center", width: 30, height: 30, borderRadius: (width), borderWidth: 1, borderColor: COLORS.white, padding: 3 }}>
-                                <Image
+                            {(msg.user == currentUser.getUsername()) && <View style={{ alignItems: "flex-end", justifyContent: "center", width: 30, height: 30, borderRadius: (width), borderWidth: 1, borderColor: COLORS.white, padding: 1 }}>
+                            {!msg.icon && <Image
                                     style={{ height: '100%', aspectRatio: 1, alignSelf: "center", borderRadius: width }}
                                     tintColor={COLORS.white}
                                     source={require('../constants/images/UIcons/icons8-person-64.png')}
                                     resizeMode="contain"
-                                />
+                                />}
+                                {msg.icon && <Image
+                                    style={{ height: '100%', aspectRatio: 1, alignSelf: "center", borderRadius: width }}
+                                    source={{uri: msg.icon}}
+                                    resizeMode="contain"
+                                />}
                             </View>}
                         </View>
                     </View>
@@ -454,7 +488,7 @@ const sendMessage = async () => {
           justifyContent: 'space-evenly',
           alignSelf: 'center'
         }}>
-            <TouchableOpacity style={[styles.safeContain, {flex: 1, alignItems: 'center', justifyContent:'center', flexDirection:'row' }]} onPress={() => setModalVisible(true)}>
+            <TouchableOpacity style={[styles.safeContain, {flex: 1, alignItems: 'center', justifyContent:'center', flexDirection:'row' }]} onPress={() => {fetchPFPIcons(); setModalVisible(true)}}>
                 <View style={{
                     borderRadius: 20,
                     height: 60,

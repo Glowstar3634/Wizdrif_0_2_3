@@ -209,7 +209,6 @@ const SignUpStudent = ({route}) => {
         style={{ height: 50, width: 150 }}
         onValueChange={handleGradeChange}
       >
-        <Picker.Item label="Elementary" value="0" />
         <Picker.Item label="6th Grade" value="6" />
         <Picker.Item label="7th Grade" value="7" />
         <Picker.Item label="8th Grade" value="8" />

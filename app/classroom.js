@@ -9,6 +9,8 @@ import { COLORS } from '../constants';
 import { auth, database, storage, firebase } from '../firebase';
 import {ref, set, get} from 'firebase/database';
 
+import UserHeader from "./components/userHeader";
+
 import Post from "./objects/postObj";
 import Card from "./objects/cardObj";
 import Profile from "./objects/profileObj";
@@ -406,44 +408,7 @@ const Classroom = ({route}) => {
           </View>
         </View>
       </Modal>
-      <View style={{
-        flex: 10,
-        margin:5,
-        flexDirection: "row",
-        justifyContent:'flex-start'
-      }}>
-        <Image
-            style={{  width: 50, height: '100%', alignSelf:"flex-start"}}
-            tintColor={COLORS.white}
-            source={require('../constants/images/UIcons/icons8-person-64.png')}
-        />
-
-        <View style={{
-        margin:10,
-        flexDirection: "column",
-        justifyContent:'space-around'
-      }}>
-        <Text
-            style={styles.pageTopText}
-        >{currentUser.getUsername()}</Text>
-
-        <Text
-            style={styles.pageTopText}
-        >Level: {currentUser.getLevel()}</Text>
-
-        <Progress.Bar style={{color:'#FFFFFF'}} progress={xpProgress} color={COLORS.wizLBlue} width={200} />
-
-      </View>
-{/* Navigation drawer add*/}
-      </View>
-
-      <View style={{ 
-        flex: 1,
-        flexDirection: "row",
-        backgroundColor:COLORS.dark1
-      }}>
-        
-      </View>
+      <UserHeader currentUser={currentUser} />
 
       <View style={{
         flex: 80,

@@ -7,6 +7,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Progress from 'react-native-progress';
 import {Picker} from '@react-native-picker/picker';
 import { COLORS } from '../constants';
+import UserHeader from "./components/userHeader";
+import Reward from "./components/reward";
 
 const Notebook = ({route}) => {
   const { currentUser } = route.params;
@@ -17,12 +19,31 @@ const Notebook = ({route}) => {
   const [modalVisible, setModalVisible] = React.useState(false);
   const { width, height } = Dimensions.get('window');
 
+  const rewardRef = React.useRef();
+
+
+  const [rewards, setRewards] = React.useState([]);
+
+  const handleShowReward = () => {
+    const newReward = {
+      title: `Reward ${rewards.length + 1}`,
+      orb: true, // Set this as needed
+      relic: false, // Set this as needed
+      xp: false, // Set this as needed
+    };
+    setRewards([...rewards, newReward]);
+  };
+
+
   return (
     <SafeAreaView style={{
       flex: 1,
       display:'flex',
       backgroundColor: COLORS.dark
     }}>
+    {rewards.map((reward, index) => (
+        <Reward key={index} reward={reward} />
+      ))}
     <Modal
         animationType="fade"
         transparent={true}
@@ -112,44 +133,7 @@ const Notebook = ({route}) => {
           </View>
         </View>
       </Modal>
-      <View style={{
-        flex: 10,
-        margin:5,
-        flexDirection: "row",
-        justifyContent:'flex-start'
-      }}>
-        <Image
-            style={{  width: 50, height: '100%', alignSelf:"flex-start"}}
-            tintColor={COLORS.white}
-            source={require('../constants/images/UIcons/icons8-person-64.png')}
-        />
-
-        <View style={{
-        margin:10,
-        flexDirection: "column",
-        justifyContent:'space-around'
-      }}>
-        <Text
-            style={styles.pageTopText}
-        >{currentUser.getUsername()}</Text>
-
-        <Text
-            style={styles.pageTopText}
-        >Level: {currentUser.getLevel()}</Text>
-
-        <Progress.Bar style={{color:'#FFFFFF'}} progress={xpProgress} color='#FFFFFF' width={200} />
-
-      </View>
-{/* Navigation drawer add*/}
-      </View>
-
-      <View style={{ 
-        flex: 1,
-        flexDirection: "row",
-        backgroundColor:COLORS.dark1
-      }}>
-        
-      </View>
+      <UserHeader currentUser={currentUser} />
 
       <View style={{
         flex: 80,
@@ -176,7 +160,7 @@ const Notebook = ({route}) => {
             flexDirection: 'row',
             justifyContent:'space-around'
           }}>
-            <View style={[styles.safeContain, {flex:1}]}>
+            <TouchableOpacity style={[styles.safeContain, {flex:1}]} onPress={()=>{handleShowReward()}}>
             <View style={[ styles.sectionShadow , {
                 borderRadius: 20,
                 height: 60,
@@ -204,7 +188,7 @@ const Notebook = ({route}) => {
                 }}>New Bookmark</Text>
 
               </View>
-            </View>
+            </TouchableOpacity>
 
             <View style={[styles.safeContain, {flex:1}]}>
             <View style={[ styles.sectionShadow , {

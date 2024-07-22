@@ -32,6 +32,7 @@ import SearchHall from "./searchHall";
 import DistrictView from "./districtView";
 import GroupView from "./groupView";
 import ProfileScreen from "./profileView";
+import EditProfile from "./editProfile";
 
 const Stack = createStackNavigator();
 const app = initializeApp(firebaseConfig);
@@ -65,6 +66,7 @@ const index = () => {
         <Stack.Screen name="districtview" component={DistrictView} />
         <Stack.Screen name="groupview" component={GroupView} />
         <Stack.Screen name="profileview" component={ProfileScreen} />
+        <Stack.Screen name="editprofile" component={EditProfile} />
         
       </Stack.Navigator>
   );
