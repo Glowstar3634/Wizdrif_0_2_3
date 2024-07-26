@@ -99,14 +99,8 @@ const CreatePost = ({route}) => {
     if (images[0] != nullImage){
       for(let i = 0; i < images.length; i++) {
         const uri = images[i].uri;
-        console.log('Localizing...');
-        const fileInfo = await FileSystem.getInfoAsync(uri);
-        const { uri: localUri } = fileInfo;
-        console.log('Encoding...');
-        const imageBase64 = await FileSystem.readAsStringAsync(localUri, { encoding: FileSystem.EncodingType.Base64 });
-        const octetStream = base64ToOctetStream(imageBase64);
         console.log('Calling...');
-        const isContentSafe = await scanContent(octetStream);
+        const isContentSafe = await scanContent(uri);
     if (!isContentSafe) {
       alert('Your post contains inappropriate photos or content. Attempting to upload this content will disable your account.');
       return;

@@ -20,7 +20,11 @@
     },
     "android": {
       "googleServicesFile": "./google-services-(2).json",
-      "package": "com.rnexpo.wizdrif"
+      "package": "com.rnexpo.wizdrif",
+      "adaptiveIcon": {
+        "foregroundImage": "./constants/images/brand/wizdriflogo_png.png",
+        "backgroundColor": "#1c1d21"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"

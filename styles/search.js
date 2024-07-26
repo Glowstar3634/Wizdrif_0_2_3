@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform} from "react-native";
 
 import { COLORS, FONT, SIZES } from "../constants";
 
@@ -276,7 +276,14 @@ const styles = StyleSheet.create({
       },
       modalHeader: {
               
-      }
+      },
+      statusBar: {
+    height: 44,
+  },
+  appBar: {
+    backgroundColor:'#79B45D',
+    height: 44,
+  }
       
 });
 

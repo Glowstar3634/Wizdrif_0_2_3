@@ -103,14 +103,8 @@ const CreateCard = ({route}) => {
     // Perform content scanning
     if (image[0] != nullImage){
         const uri = image[0].uri;
-        console.log('Localizing...');
-        const fileInfo = await FileSystem.getInfoAsync(uri);
-        const { uri: localUri } = fileInfo;
-        console.log('Encoding...');
-        const imageBase64 = await FileSystem.readAsStringAsync(localUri, { encoding: FileSystem.EncodingType.Base64 });
-        const octetStream = base64ToOctetStream(imageBase64);
         console.log('Calling...');
-        const isContentSafe = await scanContent(octetStream);
+        const isContentSafe = await scanContent(uri);
     if (!isContentSafe) {
       alert('Your card contains inappropriate photos or content. Attempting to upload this content will disable your account.');
       return;

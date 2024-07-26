@@ -131,7 +131,6 @@ const DuelPrep = ({route}) => {
   }
 
   const createLoadout = () => {
-    console.log("you have " + relicSelection.length )
     setModal2Visible(false);
     setModalVisible(true);
   }

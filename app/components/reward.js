@@ -2,8 +2,10 @@ import { SafeAreaView, StyleSheet, Text, View, Image, TouchableOpacity, TextInpu
 import React, { useState, useEffect } from 'react';
 import styles from '../../styles/search';
 import { COLORS } from '../../constants';
+import Orb from '../objects/orbObj';
+import Relic from '../objects/relicObj';
 
-const Reward = ({ reward }) => {
+const Reward = ({num, reward, onFade }) => {
   const { width, height } = Dimensions.get('window');
   const colorWheel = [
     "#5a87ff",
@@ -18,20 +20,17 @@ const Reward = ({ reward }) => {
 
   const [bgColor, setBgColor] = React.useState("#AA9FFFCC");
   const position = React.useState(new Animated.Value(0))[0];
-  const opacity = React.useState(new Animated.Value(0))[0];
+  const opacity = React.useState(new Animated.Value(1))[0];
   const [topPosition, setTopPosition] = React.useState(20);
+  const [leftPosition, setLeftPosition] = React.useState(0);
 
   React.useEffect(() => {
     const randomColor = colorWheel[Math.floor(Math.random() * colorWheel.length)];
     setBgColor(randomColor);
-    setTopPosition(Math.random() * 50);
+    setTopPosition(Math.random() * 50 + 50);
+    setLeftPosition(Math.random() * (width - (width * 0.7)));
 
     Animated.parallel([
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: true,
-      }),
       Animated.timing(position, {
         toValue: -50, // Move up by 50 units
         duration: 3000,
@@ -42,8 +41,13 @@ const Reward = ({ reward }) => {
         toValue: 0,
         duration: 3000, // Match the duration of the move-up animation
         useNativeDriver: true,
+        easing: Easing.ease
       })
-    ]).start();
+    ]).start(() => {
+        if (onFade) {
+          onFade();
+        }
+      });
   }, []);
 
   return (
@@ -57,30 +61,79 @@ const Reward = ({ reward }) => {
       position: 'absolute',
       zIndex: 20,
       top: topPosition,
-      left: Math.random() * (width - (width * 0.7)),
+      left: leftPosition,
       opacity: opacity,
       transform: [{ translateY: position }],
     }]}>
-      <Text style={[styles.header1, { color: COLORS.white, fontSize: 20, fontWeight: '700' }]}>
-        {reward.title ? reward.title : ""}
+      <Text style={[styles.header1, { color: COLORS.white, fontSize: 20, fontWeight: '700',marginTop: 10}]}>
+        {reward.title ? reward.title : "Reward!"}
       </Text>
-      <View>
-        {reward.orb && <Image 
-          style={{}} 
-          source={require('../../constants/images/UIcons/icons8-person-64.png')}
+      {reward.orb && <View style={{flexDirection:'row', width: '100%', justifyContent: 'space-evenly'}}>
+        <View style={{
+            aspectRatio:1,
+            height:'85%',
+            justifyContent:'center',
+            overflow:'hidden'
+          }}>
+        <Image 
+          style={{width: "700%", height: "700%", alignSelf:"center", opacity:1, position:'absolute'}} 
+          source={Orb.icon(reward.orb)}
           resizeMode="contain"
-        />}
-        {reward.relic && <Image 
-          style={{}} 
-          source={require('../../constants/images/UIcons/icons8-person-64.png')}
+        />
+        </View>
+        <View style={{justifyContent: 'center'}}>
+        <Text style={[styles.header1, { color: COLORS.white, fontSize: 18, fontWeight: '500' }]}>
+        {Orb.name(reward.orb)}
+      </Text>
+      <Text style={[styles.header1, { color: COLORS.white, fontSize: 18, fontWeight: '500' }]}>
+        +{reward.quantity} Orbs
+      </Text>
+        </View>
+      </View>}
+      {reward.relic && <View style={{flexDirection:'row', width: '100%', justifyContent: 'space-evenly'}}>
+        <View style={{
+            aspectRatio:1,
+            height:'85%',
+            justifyContent:'center',
+            overflow:'hidden'
+          }}>
+        <Image 
+          style={{width: "700%", height: "700%", alignSelf:"center", opacity:1, position:'absolute'}} 
+          source={Relic.icon(reward.relic)}
           resizeMode="contain"
-        />}
-        {reward.xp && <Image 
-          style={{}} 
-          source={require('../../constants/images/UIcons/icons8-person-64.png')}
+        />
+        </View>
+        <View style={{justifyContent: 'center'}}>
+        <Text style={[styles.header1, { color: COLORS.white, fontSize: 18, fontWeight: '500' }]}>
+        {Relic.name(reward.relic)}
+      </Text>
+      <Text style={[styles.header1, { color: COLORS.white, fontSize: 18, fontWeight: '500' }]}>
+        +{reward.quantity} Relic
+      </Text>
+        </View>
+      </View>}
+      {reward.xp && <View style={{flexDirection:'row', width: '100%', justifyContent: 'space-evenly'}}>
+        <View style={{
+            aspectRatio:1,
+            height:'85%',
+            justifyContent:'center',
+            overflow:'hidden'
+          }}>
+        <Image 
+          style={{width: "700%", height: "700%", alignSelf:"center", opacity:1, position:'absolute'}} 
+          source={require("../../constants/images/Orbs/XP-Orb.png")}
           resizeMode="contain"
-        />}
-      </View>
+        />
+        </View>
+        <View style={{justifyContent: 'center'}}>
+        <Text style={[styles.header1, { color: COLORS.white, fontSize: 18, fontWeight: '500' }]}>
+        Experience Points
+      </Text>
+      <Text style={[styles.header1, { color: COLORS.white, fontSize: 18, fontWeight: '500' }]}>
+        +{reward.quantity} XP
+      </Text>
+        </View>
+      </View>}
     </Animated.View>
   );
 };

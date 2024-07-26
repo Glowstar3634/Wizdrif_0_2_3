@@ -23,6 +23,8 @@ import topicOtherSpinner from "./lists/otherTopics";
 import noTopics from "./lists/noTopics";
 import tags from "./lists/tags";
 import dtags from "./lists/districtTags";
+import grades from "./lists/grades";
+import ages from "./lists/ages";
 
 import badWordChecker from "./functions/badWordChecker";
 import scanContent from "./functions/scanContent";
@@ -49,6 +51,7 @@ const EditProfile = ({route}) => {
   
   const nullImage = require('../constants/images/UIcons/icons8-person-64.png')
   const [image, onImagesUpdate] = React.useState([(currentUser.getPfp() ? currentUser.getPfp() : nullImage)]);
+  const [imageUpdated, setImageUpdated] = React.useState(false);
   const [modalVisible, setModalVisible] = React.useState(false);
 
   const [postPrivate, setPostPrivate] = React.useState(false);
@@ -58,73 +61,31 @@ const EditProfile = ({route}) => {
   const [badInput, setBadInput] = React.useState(false);
   const [badInput2, setBadInput2] = React.useState(false);
 
-  const [tags1, setTags1] = React.useState("");
-  const [tags2, setTags2] = React.useState("");
+  const [tags1, setTags1] = React.useState(currentUser.getAge());
+  const [tags2, setTags2] = React.useState(currentUser.getGrade());
 
-
-  const toggleSwitch = () => setPostPrivate(previousState => !previousState);
-  const toggleSwitch1 = () => setOfficial(previousState => !previousState);
-  const toggleSwitch2 = () => setInvite(previousState => !previousState);
-  const toggleSwitch3 = () => {
-    if(max == -1){
-        setMax(0)
-    }else{
-        setMax(-1)
-    }
-  };
-  const toggleSwitch4 = () => {
-    if (restricted){
-        setAllowedAccounts(["Student", "Educator", "Personal"])
-    }
-    setRestricted(previousState => !previousState)
-  };
-  const toggleSwitch5 = () => {
-    if(levelReq == 0){
-        setLevelReq(1)
-    }else{
-        setLevelReq(0)
-    }
-  };
-  const toggleAccount = (accountType) => {
-    setAllowedAccounts((prev) => {
-      if (prev.includes(accountType)) {
-        return prev.filter((account) => account !== accountType);
-      } else {
-        return [...prev, accountType];
-      }
-    });
-  };
-
-  const toggleStudent = () => toggleAccount("Student");
-  const toggleEducator = () => toggleAccount("Educator");
-  const togglePersonal = () => toggleAccount("Personal");
 
   function isNumeric(str) {
     if (typeof str != "string") return false // we only process strings!  
     return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
            !isNaN(parseInt(str)) // ...and ensure strings of whitespace fail
   }
-  const memberCount = (input) => {
-    if (isNumeric(input) && parseInt(input) > 0){
-        setMax(parseInt(input))
-        return true;
-    }else{
-        return false;
-    }
-  }
-  const levelReqCheck = (input) => {
-    if (isNumeric(input)){
-        setLevelReq(parseInt(input))
-        return true;
-    }else{
-        return false;
-    }
-  }
 
   const save = async() => {
-    if (image[0] != nullImage){ //Uploading images
-        for(let i = 0; i < image.length; i++) {
-        const { uri } = await FileSystem.getInfoAsync(image[i].uri);
+    if(!badWordChecker(first) || !badWordChecker(last) || !badWordChecker(bio)){
+        alert("Your profile contains innapropriate language")
+        return null
+    }
+    console.log("starting")
+    if (image[0] != nullImage && imageUpdated){ //Uploading images
+        const urii = image[0];
+        
+        const isContentSafe = await scanContent(urii);
+        if(!isContentSafe){
+            alert('Your profile picture contains inappropriate photos or content. Attempting to upload this content will disable your account.');
+            return null
+        }
+        const { uri } = await FileSystem.getInfoAsync(image[0]);
         const blob = await new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
             xhr.onload = () => {
@@ -145,108 +106,38 @@ const EditProfile = ({route}) => {
             currentUser.setPfp(url)
             set(ref(database, ("users/" + currentUser.getUsername() + "/pfp")), url)
             .then(()=>{
-                navigation.goBack()
+                create()
             })
         }
-
-        }
+    }else{
+        create()
     }
   }
   
 
-  const create = async () => {
-    console.log('Checking...');
-    if (!titleInput.trim()) {
-      alert('Please enter a name for your district');
-      return;
-    }
-    if (titleInput.trim() == "Rogue Student" || titleInput.trim() == "The Admins" || titleInput.trim() == "Wizdrif" || titleInput.trim() == "Ghosts of Deletion") {
-        alert('That district name is restricted!');
-        return;
-    }
-    if (titleInput.length > 75 || titleInput.length < 5) {
-      alert('District Name must be between 5-75 characters');
-      return;
-    }
-    try {
-      const districtsRef = ref(database, 'districts');
-      const snapshot = await get(districtsRef);
-      if (snapshot.exists()) {
-        const districts = snapshot.val();
-        for (const districtId in districts) {
-          if (districts[districtId].name.toLowerCase() === titleInput.trim().toLowerCase()) {
-            alert('The district name is already taken. Please choose a different name.');
-            return;
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Error checking district names: ', error);
-      alert('An error occurred while checking district names. Please try again.');
-      return;
-    }
-    if (!descInput.trim()) {
-      alert('Please enter a description for your district');
-      return;
-    }
-    if (descInput.length > 600) {
-      alert('Maximum description length of 600 characters');
-      return;
-    }
-    if(official && currentUser.getAccount() != 2){
-        alert('Only educators may create an official school district.');
-        return;
-    }
-    if (!badWordChecker(titleInput) || !badWordChecker(descInput)) {
-      alert('Your fields contains inappropriate language');
-      return;
-    }
-    if (max < 2) {
-        alert('Maximum member limit must exceed 1!');
-        return;
-    }
-    if(levelReq > currentUser.getLevel()){
-      alert('Level Requirement cannot exceed your own level!');
-      return;
-    }
-    if(currentUser.getAccount() == 1 && !allowedAccounts.includes("Student") || currentUser.getAccount() == 2 && !allowedAccounts.includes("Educator") || currentUser.getAccount() == 3 && !allowedAccounts.includes("Personal")){
-        alert('You cannot restrict your own account type!');
-      return;
-    }
-  
-    // Perform content scanning
-    if (image[0] != nullImage){
-      for(let i = 0; i < image.length; i++) {
-        const uri = image[i].uri;
-        console.log('Localizing...');
-        const fileInfo = await FileSystem.getInfoAsync(uri);
-        const { uri: localUri } = fileInfo;
-        console.log('Encoding...');
-        const imageBase64 = await FileSystem.readAsStringAsync(localUri, { encoding: FileSystem.EncodingType.Base64 });
-        const octetStream = base64ToOctetStream(imageBase64);
-        console.log('Calling...');
-        const isContentSafe = await scanContent(octetStream);
-    if (!isContentSafe) {
-      alert('Your photo contains inappropriate content. Attempting to upload this content will disable your account.');
-      return;
-    } 
-      }
-    }
-    console.log('Proceeding...');
-    
-    if(tags1){
-      districtJSON.tags.push(tags1);
-    }
-    if(tags2 && tags1 != tags2){
-        districtJSON.tags.push(tags2);
-    }
-    console.log('District Name:', titleInput);
-    console.log('Description:', descInput);
-    console.log('Private:', postPrivate);
-    console.log('Images:', (image[0] != nullImage));
-    console.log('Tags:', postTags.length);
-
-    uploadPost();
+  const create = () => {
+    currentUser.setFirstName(first)
+    set(ref(database, "users/" + currentUser.getUsername() + "/firstName"), first)
+    .then(()=>{
+        currentUser.setLastName(last)
+        set(ref(database, "users/" + currentUser.getUsername() + "/lastName"), last)
+        .then(()=>{
+            currentUser.setBio(bio)
+            set(ref(database, "users/" + currentUser.getUsername() + "/bio"), bio)
+            .then(()=>{
+                currentUser.setAge(tags1)
+                set(ref(database, "users/" + currentUser.getUsername() + "/age"), tags1)
+                .then(()=>{
+                    currentUser.setGrade(tags2)
+                    set(ref(database, "users/" + currentUser.getUsername() + "/grade"), tags2)
+                    .then(()=>{
+                        alert("Profile Updated Successfully!")
+                        navigation.goBack()
+                    })
+                })
+            })
+        })
+    })
   };
 
 
@@ -288,11 +179,13 @@ const EditProfile = ({route}) => {
     if (imageUri != null){
       image.pop();
       image.push(imageUri);
+      setImageUpdated(true)
     } else if (imageUri == null){
       image.pop();
       if (image.length == 0){
         image.push(nullImage)
       }
+      setImageUpdated(false)
     }
     onImagesUpdate([...image]);
   }
@@ -540,7 +433,7 @@ const EditProfile = ({route}) => {
         width:'95%',
         flexDirection: "row",
         backgroundColor:COLORS.dark1,
-        zIndex: -10
+        zIndex: -10,
         }}/>
 
         <View style={[ styles.sectionShadow , {
@@ -576,7 +469,7 @@ const EditProfile = ({route}) => {
           height: 'auto',
           marginTop: 20,
           width: '95%',
-          backgroundColor: COLORS.dark2, zIndex:-5
+          backgroundColor: COLORS.dark2, zIndex:-5, marginBottom: 100
         }]}>
 
           <Text style={styles.fieldDesc}>Edit Bio</Text>
@@ -593,8 +486,9 @@ const EditProfile = ({route}) => {
           <View style={[styles.field]}>
           <SelectList
         setSelected={(tag) => setTags1(tag)} 
-        data={dtags} 
-        save="value"
+        data={ages}
+        placeholder={ages.filter((age) => age.key == currentUser.getAge())[0].key}
+        save="key"
         labelStyles={{
           color:COLORS.white
         }}
@@ -613,8 +507,9 @@ const EditProfile = ({route}) => {
           <View style={[styles.field, {zIndex:-3,marginBottom:20}]}>
           <SelectList
         setSelected={(tag) => setTags2(tag)} 
-        data={dtags} 
-        save="value"
+        data={grades} 
+        save="key"
+        placeholder={grades.filter((grade) => grade.key == currentUser.getGrade())[0].key}
         labelStyles={{
           color:COLORS.white
         }}

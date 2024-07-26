@@ -427,9 +427,13 @@ const SearchHall = ({route}) => {
             <TouchableOpacity style={{
               alignContent:'center',
               width:'90%'
-            }} onPress={()=> {
+            }} onPress={async()=> {
               setModal3Visible(null);
-              navigation.navigate("createcard", {currentUser: currentUser})}}>
+              let user = await get(ref(database, "users/" + modal3Visible.username))
+              if(user.exists()){
+                navigation.navigate("profileview", {currentUser: currentUser, userView: user.val()})
+              }
+              }}>
               <View style={[ styles.sectionShadow , {
                 borderRadius: 20,
                 height: 60,

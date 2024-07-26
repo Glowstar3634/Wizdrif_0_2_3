@@ -2,8 +2,8 @@ import { useRouter } from "expo-router";
 import { useNavigation } from '@react-navigation/native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { SafeAreaView, StyleSheet, Text, View, Image, TouchableOpacity, TextInput} from 'react-native'
-import React from 'react'
+import { SafeAreaView, StyleSheet, Text, View, Image, TouchableOpacity, TextInput, StatusBar } from 'react-native';
+import React from 'react';
 import styles from '../styles/search';
 import { COLORS } from '../constants';
 import firebaseConfig from "../FirebaseConfig";
@@ -36,9 +36,11 @@ import EditProfile from "./editProfile";
 
 const Stack = createStackNavigator();
 const app = initializeApp(firebaseConfig);
+
 const index = () => {
-  
   return (
+    <NavigationContainer independent={true}>
+      {/* Set the status bar background color and text style */}
       <Stack.Navigator initialRouteName="start" screenOptions={{
         headerShown: false,
         gestureEnabled: false
@@ -67,8 +69,8 @@ const index = () => {
         <Stack.Screen name="groupview" component={GroupView} />
         <Stack.Screen name="profileview" component={ProfileScreen} />
         <Stack.Screen name="editprofile" component={EditProfile} />
-        
       </Stack.Navigator>
+    </NavigationContainer>
   );
 };
 

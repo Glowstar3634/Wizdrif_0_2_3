@@ -155,6 +155,19 @@ class Relic {
     
         return allRelicNames[sub][num];
     }
+
+    static all() {
+        const names1 = ["1-1", "1-2", "1-3"];
+        const names2 = ["2-1", "2-2", "2-3"];
+        const names3 = ["3-1", "3-2", "3-3"];
+        const names4 = ["4-1", "4-2", "4-3"];
+        const names5 = ["5-1", "5-2", "5-3", "5-4"];
+        const names6 = ["6-1", "6-2", "6-3"];
+        const names7 = ["7-1", "7-2", "7-3", "7-4"];
+        const names8 = ["8-1", "8-2"];
+    
+        return [names1, names2, names3, names4, names5, names6, names7, names8];
+    }
     
     getRelicID() {
         return this.relicID;

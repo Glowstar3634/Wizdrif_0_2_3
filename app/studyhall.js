@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView, StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ScrollView, Modal , Dimensions, Alert } from 'react-native'
+import { SafeAreaView, StyleSheet, Text, View, Image, TouchableOpacity, TextInput, ScrollView, Modal , Dimensions, Alert, Platform, StatusBar } from 'react-native'
 import React from 'react'
 import styles from '../styles/search';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -8,6 +8,7 @@ import * as Progress from 'react-native-progress';
 import {Picker} from '@react-native-picker/picker';
 import { COLORS } from '../constants';
 import UserHeader from "./components/userHeader";
+import { getStatusBarHeight } from 'react-native-status-bar-height';
 
 import { auth, database, storage, firebase } from '../firebase';
 import {ref, set, get, remove, onChildChanged, onChildAdded, off} from 'firebase/database';
@@ -171,12 +172,15 @@ React.useEffect(() => {
   } fetchData()
   }, []);
 
+  
+
   return (
     <SafeAreaView style={{
       flex: 1,
       display:'flex',
       backgroundColor: COLORS.dark
     }}>
+      
       <UserHeader currentUser={currentUser} />
 
       <View style={{
