@@ -1,12 +1,13 @@
 import { useRouter } from "expo-router";
 import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView, StyleSheet, Text, View, Image, TouchableOpacity, TextInput } from 'react-native'
+import { SafeAreaView, StyleSheet, Text, View, Image, TouchableOpacity, TextInput, Dimensions} from 'react-native'
 import React from 'react'
 import styles from '../styles/search';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
 import { COLORS } from '../constants';
 import { Profile} from "./objects/profileObj";
+import { Video } from 'expo-av';
 
 const SignUpStudent = ({route}) => {
   const { newAccount } = route.params;
@@ -21,6 +22,7 @@ const SignUpStudent = ({route}) => {
 
   const badWords = ["2g1c","fck", "dck", "2 girls 1 cup","acrotomophilia","alabama hot pocket","alaskan pipeline","anal","anilingus","anus","apeshit","arsehole","DISABLEDass","asshole","assmunch","auto erotic","autoerotic","babeland","baby batter","baby juice","ball gag","ball gravy","ball kicking","ball licking","ball sack","ball sucking","bangbros","bareback","barely legal","barenaked","bastard","bastardo","bastinado","beaner","beaners","beaver cleaver","beaver lips","bestiality","big black","big breasts","big knockers","big tits","bimbos","birdlock","bitches","black cock","blonde action","blonde on blonde action","blowjob","blow job","blow your load","blue waffle","blumpkin","bollocks","bondage","boner","boob","boobs","booty call","brown showers","brunette action","bukkake","bulldyke","bullet vibe","bullshit","bung hole","bunghole","busty","buttcheeks","butthole","camel toe","camgirl","camslut","camwhore","carpet muncher","carpetmuncher","chocolate rosebuds","circlejerk","cleveland steamer","clitoris","clover clamps","clusterfuck","cock","cocks","coprolagnia","coprophilia","cornhole","coon","coons","creampie","cumming","cunnilingus","cunt","cuck","darkie","date rape","daterape","deep throat","deepthroat","dendrophilia","dildo","dingleberry","dingleberries","dirty pillows","dirty sanchez","doggie style","doggiestyle","doggy style","doggystyle","dog style","dolcett","dominatrix","dommes","donkey punch","double dong","double penetration","dp action","dry hump","eat my ass","ecchi","ejaculation","erotic","erotism","escort","eunuch","faggot","fecal","fellatio","feltch","female squirting","femdom","figging","fingerbang","fingering","fisting","foot fetish","footjob","frotting","fuck","fuck buttons","fuckin","fucking","fucktards","fudge packer","fudgepacker","futanari","gang bang","gay sex","genitals","giant cock","girl on top","girls gone wild","goatcx","goatse","god damn","gokkun","golden shower","goodpoop","goo girl","goregasm","grope","group sex","g-spot","hand job","handjob","hard core","hardcore","hentai","homoerotic","honkey","hooker","hot carl","hot chick","how to kill","how to murder","huge fat","humping","incest","intercourse","jack off","jail bait","jailbait","jelly donut","jerk off","jigaboo","jiggaboo","jiggerboo","jizz","juggs","kike","kinbaku","kinkster","kinky","knobbing","leather restraint","leather straight jacket","lemon party","lolita","lovemaking","make me come","male squirting","masturbate","menage a trois","milf","missionary position","motherfucker","mound of venus","mr hands","muff diver","muffdiving","nambla","nawashi","negro","neonazi","nigga","nigger","nig nog","nimphomania","nipple","nipples","nsfw images","nude","nudity","nympho","nymphomania","octopussy","omorashi","one cup two girls","one guy one jar","orgasm","orgy","paedophile","paki","panties","panty","pedobear","pedophile","pegging","penis","phone sex","piece of shit","pissing","piss pig","pisspig","playboy","pleasure chest","pole smoker","ponyplay","poontang","punany","poop chute","poopchute","porn","porno","pornography","prince albert piercing","pubes","pussy","queaf","queef","quim","raghead","raging boner","raping","rapist","rectum","reverse cowgirl","rimjob","rimming","rosy palm","rosy palm and her 5 sisters","rusty trombone","sadism","santorum","schlong","scissoring","semen","shaved beaver","shaved pussy","shemale","shibari","shit","shitblimp","shitty","shota","shrimping","skeet","slanteye","slut","s&m","smut","snatch","snowballing","sodomize","sodomy","splooge","splooge moose","spooge","spread legs","spunk","strap on","strapon","strappado","strip club","style doggy","suck","sucks","suicide girls","sultry women","swastika","swinger","tainted love","taste my","tea bagging","threesome","throating","tied up","tight white","tits","titties","titty","tongue in a","topless","tosser","towelhead","tranny","tribadism","tub girl","tubgirl","tushy","twat","twink","twinkie","two girls one cup","undressing","upskirt","urethra play","urophilia","vagina","venus mound","vibrator","violet wand","vorarephilia","voyeur","vulva","wank","wetback","wet dream","white power","wrapping men","wrinkled starfish","yaoi","yellow showers","yiffy","zoophilia"];
   
+  const { width, height } = Dimensions.get('window');
   const handleDateChange = (event, date) => {
     if (date !== undefined) {
       setSelectedDate(date);
@@ -109,6 +111,25 @@ const SignUpStudent = ({route}) => {
         justifyContent:'center',
         backgroundColor:COLORS.dark
     }}>
+    <Video
+        source={require('../constants/videos/copy_5CA685BD-EF84-422B-A87D-C06248BA2986.mov')}   // Change this to the path of your video file
+        style={{
+          position: 'absolute',
+          top: -350,
+          left: 0,
+          bottom: 0,
+          right: 0,
+          flex: 1,
+          zIndex: -99,
+          width: width
+        }}
+        rate={1.0}
+        volume={1.0}
+        isMuted={false}
+        shouldPlay = {true}
+        isLooping = {true}
+        resizeMode="cover"
+      />
         <View style={{
         alignContent:'center',
         flexDirection: 'column',
@@ -118,6 +139,7 @@ const SignUpStudent = ({route}) => {
         }}>
           <Image
             style={{ width: '50%', height: '50%', alignSelf:"center"}}
+            resizeMode="contain"
             source={require('../constants/images/brand/wizdriflogo_png.png')}
           />
         </View>
@@ -126,9 +148,9 @@ const SignUpStudent = ({route}) => {
         alignContent:'space-around',
         flexDirection: 'column',
         justifyContent:'flex-start',
-        flex:4,
+        flex:3,
         width:'100%',
-        backgroundColor:COLORS.white,
+        backgroundColor:COLORS.superDark,
         
         borderTopRightRadius: 70,
         }}>
@@ -139,18 +161,19 @@ const SignUpStudent = ({route}) => {
         >
             <Image
             style={{ width: 55, height: 55}}
+            tintColor={COLORS.white}
             source={require('../constants/images/UIcons/left-arrow-6404.png')}/>
         </TouchableOpacity>
         
         </View>
         <View style={{flex:2}}>
-        <Text style={[styles.startHeaders, {marginTop: 0}]}>Welcome!</Text>
+        <Text style={[styles.startHeaders, {marginTop: 0},{color: COLORS.white}]}>Welcome!</Text>
 
-        <Text style={styles.startDescs}>Please enter your name, age, and grade.</Text>
+        <Text style={[styles.startDescs,{color: COLORS.white}]}>Please enter your name, age, and grade.</Text>
         </View>
 
         <View style={{flex:6}}>
-        <Text style={styles.startInputHint}>First Name</Text>
+        <Text style={[styles.startInputHint,{color: COLORS.white}]}>First Name</Text>
         <View style={styles.startInputArea}>
           <TextInput 
             style={styles.startInput}
@@ -159,7 +182,7 @@ const SignUpStudent = ({route}) => {
           />
         </View>
 
-        <Text style={styles.startInputHint}>Last Name</Text>
+        <Text style={[styles.startInputHint,{color: COLORS.white}]}>Last Name</Text>
 
         <View style={styles.startInputArea}>
           <TextInput 
@@ -169,7 +192,7 @@ const SignUpStudent = ({route}) => {
           />
         </View>
 
-        <Text style={styles.startInputHint}>Age - You are {calculateAge(selectedDate)} years old</Text>
+        <Text style={[styles.startInputHint,{color: COLORS.white}]}>Age - You are {calculateAge(selectedDate)} years old</Text>
         <View style={[styles.startInputArea, {backgroundColor: COLORS.white}]}>
         {show && (<DateTimePicker
   style={{ width:'70%', height:'100%', padding:10, alignSelf:"flex-start"}}
@@ -195,13 +218,13 @@ const SignUpStudent = ({route}) => {
   onChange={handleDateChange}
 />)}
 {!show && (<TouchableOpacity
-          style={[styles.buttonStart, styles.loginButton]}
+          style={[styles.buttonStart, styles.loginButton, {width: '100%'}]}
           onPress={showDateSelector}
         >
           <Text style={styles.buttonText}>Enter Birthdate</Text>
         </TouchableOpacity>)}
         </View>
-        <Text style={styles.startInputHint}>Grade</Text>
+        <Text style={[styles.startInputHint,{color: COLORS.white}]}>Grade</Text>
 
         <View style={[styles.startInputArea, {backgroundColor: COLORS.white}]}>
         {pickGrade && (<Picker
@@ -219,7 +242,7 @@ const SignUpStudent = ({route}) => {
         <Picker.Item label="College or University" value="13" />
       </Picker>)}
       {!pickGrade && (<TouchableOpacity
-          style={[styles.buttonStart, styles.loginButton]}
+          style={[styles.buttonStart, styles.loginButton, {width: '100%'}]}
           onPress={showGradeSelector}
         >
           <Text style={styles.buttonText}>Choose your grade</Text>

@@ -12,6 +12,7 @@ import { COLORS } from '../constants';
 import {Profile} from './objects/profileObj';
 import { auth, database, storage, firebase } from '../firebase';
 import {ref, set, get, push, child} from 'firebase/database';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ProfileScreen = ({route}) => {
     const { currentUser, userView } = route.params;
@@ -36,6 +37,22 @@ const ProfileScreen = ({route}) => {
   const myCards = () =>{
     
   }
+
+  const logout = ()=>{
+    clearCredentials()
+    navigation.navigate("start")
+  }
+
+  const clearCredentials = async () => {
+    try {
+      await AsyncStorage.removeItem('username');
+      await AsyncStorage.removeItem('password');
+      console.log('Credentials cleared successfully.');
+    } catch (error) {
+      console.log('Error clearing credentials:', error);
+    }
+  };
+
   return (
     <SafeAreaView style={{
       flex: 1,
@@ -43,8 +60,9 @@ const ProfileScreen = ({route}) => {
       backgroundColor: COLORS.dark,
       alignItems: 'center'
     }}>
+      <View style={{flexDirection:'row', alignItems:'center', justifyContent: 'space-between', width: '100%'}}>
       <TouchableOpacity
-          style={{alignSelf:'flex-start'}}
+          style={{alignSelf:'center'}}
           onPress={() => navigation.goBack()}
         >
             <Image
@@ -52,6 +70,35 @@ const ProfileScreen = ({route}) => {
             tintColor={COLORS.white}
             source={require('../constants/images/UIcons/left-arrow-6404.png')}/>
         </TouchableOpacity>
+        <TouchableOpacity style={[styles.safeContain, {marginEnd: 15}]} onPress={() => logout()}>
+              <View style={[ styles.sectionShadow , {
+                borderRadius: 10,
+                height: 'auto',
+                marginTop: 20,
+                alignSelf: 'center',
+                backgroundColor: COLORS.red,
+                shadowColor: COLORS.red,
+                shadowRadius:5,
+                flexDirection:'column',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }]}>
+                <Text style={{
+                  color: 'white', 
+                  fontSize: 15,
+                  fontWeight: 'bold',
+                  alignContent: 'flex-start',
+                  height:'auto',
+                  alignSelf:'center',
+                  margin: 10
+                }}>   Logout   </Text>
+
+              </View>
+            </TouchableOpacity>
+
+      </View>
+
+      
       <ScrollView style={{
         width: "100%"
       }} contentContainerStyle={{

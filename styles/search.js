@@ -80,8 +80,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         alignSelf:"center",
         justifyContent: 'center',
-        width:'60%',
-        borderRadius: 8,
+        width:'70%',
+        borderRadius: 99,
+        backgroundColor: COLORS.gray2
     },
     buttonText: {
       fontSize: 18,
@@ -133,7 +134,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         width:'100%',
         padding:10,
-        color:'black'
+        color:'white'
     },
     startInputHint: {
         fontSize: 12,
@@ -146,13 +147,13 @@ const styles = StyleSheet.create({
         alignItems:'center'
     },
     startInputArea: {
-        height:50,
+        height:45,
         alignItems: 'center',
         alignSelf:"center",
         justifyContent: 'center',
         width:'70%',
-        borderRadius: 20,
-        backgroundColor: COLORS.light
+        borderRadius: 99,
+        backgroundColor: COLORS.gray2
     },
     postContainer:{
         height:500,

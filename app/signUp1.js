@@ -1,10 +1,14 @@
 import { useRouter } from "expo-router";
 import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView, StyleSheet, Text, View, Image, TouchableOpacity, TextInput} from 'react-native'
+import { SafeAreaView, StyleSheet, Text, View, Image, TouchableOpacity, TextInput, Dimensions} from 'react-native'
 import React from 'react'
 import styles from '../styles/search';
 import Profile from "./objects/profileObj";
+
+import { Video } from 'expo-av';
 import { COLORS } from '../constants';
+
+const { width, height } = Dimensions.get('window');
 
 const SignUp1 = () => {
   const navigation = useNavigation();
@@ -30,6 +34,25 @@ const SignUp1 = () => {
         justifyContent:'center',
         backgroundColor:COLORS.dark
     }}>
+    <Video
+        source={require('../constants/videos/copy_5CA685BD-EF84-422B-A87D-C06248BA2986.mov')}   // Change this to the path of your video file
+        style={{
+          position: 'absolute',
+          top: -350,
+          left: 0,
+          bottom: 0,
+          right: 0,
+          flex: 1,
+          zIndex: -99,
+          width: width
+        }}
+        rate={1.0}
+        volume={1.0}
+        isMuted={false}
+        shouldPlay = {true}
+        isLooping = {true}
+        resizeMode="cover"
+      />
         <View style={{
         alignContent:'center',
         flexDirection: 'column',
@@ -39,6 +62,7 @@ const SignUp1 = () => {
         }}>
           <Image
             style={{ width: '50%', height: '50%', alignSelf:"center"}}
+            resizeMode="contain"
             source={require('../constants/images/brand/wizdriflogo_png.png')}
           />
         </View>
@@ -47,27 +71,29 @@ const SignUp1 = () => {
         alignContent:'space-around',
         flexDirection: 'column',
         justifyContent:'flex-start',
-        flex:4,
+        flex:3,
         width:'100%',
-        backgroundColor:COLORS.white,
+        backgroundColor:COLORS.superDark,
         
         borderTopRightRadius: 70,
         }}>
         <View style={{flex:1}}>
         <TouchableOpacity
-          style={{}}
+          style={{padding: 10}}
           onPress={() => navigation.goBack()}
         >
             <Image
-            style={{ width: 55, height: 55}}
+            style={{ width: 45, height: 45}}
+            tintColor={COLORS.white}
+            resizeMode="contain"
             source={require('../constants/images/UIcons/left-arrow-6404.png')}/>
         </TouchableOpacity>
         
         </View>
         <View style={{flex:4}}>
-        <Text style={styles.startHeaders}>Which fits you?</Text>
+        <Text style={[styles.startHeaders,{color: COLORS.white}]}>Which fits you?</Text>
 
-        <Text style={styles.startDescs}>Choose an account type that represents {"\n"}what you are using this account for.</Text>
+        <Text style={[styles.startDescs,{color: COLORS.white}]}>Choose an account type that represents {"\n"}what you are using this account for.</Text>
         </View>
 
         <View style={{flex:4, flexDirection:"row", alignContent:'space-around', justifyContent: "space-around"}}>

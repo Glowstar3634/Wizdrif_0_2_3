@@ -10,12 +10,13 @@ const COLORS = {
   dark: "#1c1d21",
   dark1: "#141417",
   dark2: "#2e2e2e",
+  superDark: "#090a08",
 
   light:"#CDCDCD",
 
   white: "#F3F4F8",
   lightWhite: "#FAFAFC",
-  black: "#FF000000",
+  black: "#000000FF",
   
   white: "#FFFFFFFF",
   red: "#A0281F",

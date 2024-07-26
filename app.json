@@ -9,7 +9,7 @@
     "splash": {
       "image": "./constants/images/brand/wizdriflogo_png.png",
       "resizeMode": "contain",
-      "backgroundColor": "#1c1d21"
+      "backgroundColor": "#050008"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -23,7 +23,7 @@
       "package": "com.rnexpo.wizdrif",
       "adaptiveIcon": {
         "foregroundImage": "./constants/images/brand/wizdriflogo_png.png",
-        "backgroundColor": "#1c1d21"
+        "backgroundColor": "#050008"
       }
     },
     "web": {
@@ -40,7 +40,8 @@
           "microphonePermission": "Allow Wizdrif to access your microphone"
         }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-build-properties"
     ]
   }
 }
